@@ -1,0 +1,36 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.so
+*.pyo
+*.pyd
+
+# Virtual environment
+.venv/
+env/
+venv/
+
+# dotenv, config, and git operations
+.env
+push-to-github.sh
+
+# Log files
+*.log
+/log/
+
+# Output and intermediate data
+*.apk
+/data/
+/idea/
+/database/
+/reports/
+/summary-reports/
+
+# IDE/editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Mac/Unix metadata
+.DS_Store
+Thumbs.db
