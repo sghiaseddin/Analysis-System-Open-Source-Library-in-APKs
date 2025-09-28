@@ -2,7 +2,7 @@
 
 This is a pipeline to research open source libraries used within a corpus of Android APKs. The system is designed for large-scale analysis using [AndroZoo](https://androzoo.uni.lu/) data and aims to detect library usage through static analysis and fingerprint matching.
 
-Version: 0.1.0
+Version: 0.1.1
 
 ---
 
