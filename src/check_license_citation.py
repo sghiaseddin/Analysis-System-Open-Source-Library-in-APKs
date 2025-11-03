@@ -3,6 +3,10 @@ import csv
 import os
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import re
+from datetime import datetime
+
+def log(m): print(f"[{datetime.now().strftime('%H:%M:%S')}] {m}", flush=True)
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Check license citation in decoded APKs")
@@ -12,30 +16,32 @@ def parse_args():
     parser.add_argument("--log-every", type=int, default=10, help="Log progress every N repos (default: 10)")
     return parser.parse_args()
 
-def repo_cited_in_decoded_apk(sha256, repo_url, decoded_dir):
-    base_path = Path(decoded_dir) / sha256
-    if not base_path.exists():
-        return False
-    # Walk through all files and directories inside base_path
-    for root, dirs, files in os.walk(base_path):
-        # Check directory names
-        for d in dirs:
-            if repo_url in d:
-                return True
-        # Check file names
-        for f in files:
-            if repo_url in f:
-                return True
-            # Also check file content if file is readable text
-            file_path = Path(root) / f
+def extract_all_urls(decoded_path):
+    url_pattern = re.compile(
+        r"(?:(?:https?|ftp):\/\/)?(?:[\w.-]+(?:\.[\w\.-]+)+)(?:\/[\w\-\._~:/?#[\]@!$&'()*+,;%=]*)?",
+        re.IGNORECASE
+    )
+    all_urls = set()
+    for root, dirs, files in os.walk(decoded_path):
+        for file in files:
             try:
-                with open(file_path, "r", encoding="utf-8", errors="ignore") as file:
-                    for line in file:
-                        if repo_url in line:
-                            return True
+                with open(Path(root) / file, "r", encoding="utf-8", errors="ignore") as f:
+                    for line in f:
+                        matches = url_pattern.findall(line)
+                        all_urls.update(matches)
             except Exception:
-                # Ignore files that cannot be read as text
                 continue
+    return all_urls
+
+def is_url_cited(repo_url, all_urls):
+    stripped_url = re.sub(r"^https?://", "", repo_url)
+    for u in all_urls:
+        if stripped_url in u or u in repo_url:
+            return True
+    return False
+
+def repo_cited_in_decoded_apk(pkg_name, repo_url, decoded_dir, url_pattern):
+    # This function is no longer used as per the new logic
     return False
 
 def process_csv(csv_path, workers, log_every, decoded_dir):
@@ -45,29 +51,38 @@ def process_csv(csv_path, workers, log_every, decoded_dir):
         reader = csv.DictReader(f)
         fieldnames = reader.fieldnames
         if "repo_url" not in fieldnames:
-            print(f"Skipping {csv_path}: no 'repo_url' column found.")
             return
         for row in reader:
             rows.append(row)
 
-    # Extract unique repo_urls
-    repo_urls = list({row["repo_url"] for row in rows})
+    url_pattern = re.compile(
+        r"(?:(?:https?|ftp):\/\/)?(?:[\w.-]+(?:\.[\w\.-]+)+)(?:\/[\w\-\._~:/?#[\]@!$&'()*+,;%=]*)?",
+        re.IGNORECASE
+    )
+
+    # Extract unique repo_urls that are not already cited
+    repo_urls = list({row["repo_url"] for row in rows if not row.get("cited") or row.get("cited") == "0"})
 
     # Map repo_url to cited status
     cited_map = {}
 
-    def check_repo(repo_url):
-        # The sha256 is assumed to be the file name without extension
-        sha256 = csv_path.stem
-        return repo_url, int(repo_cited_in_decoded_apk(sha256, repo_url, decoded_dir))
+    # Pre-extract all URLs for each decoded apk (pkg_name)
+    pkg_name = csv_path.stem
+    decoded_path = Path(decoded_dir) / pkg_name
+    all_urls = extract_all_urls(decoded_path)
 
-    with ThreadPoolExecutor(max_workers=workers) as executor:
-        futures = {executor.submit(check_repo, repo_url): repo_url for repo_url in repo_urls}
-        for i, future in enumerate(as_completed(futures), 1):
-            repo_url, cited = future.result()
-            cited_map[repo_url] = cited
-            if i % log_every == 0:
-                print(f"[{csv_path.name}] Processed {i}/{len(repo_urls)} repo_urls")
+    def check_repo(repo_url):
+        return repo_url, int(is_url_cited(repo_url, all_urls))
+
+    for i, repo_url in enumerate(repo_urls, 1):
+        cited = int(is_url_cited(repo_url, all_urls))
+        cited_map[repo_url] = cited
+        if i % log_every == 0:
+            pass
+            # log(f"[{csv_path.name}] Processed {i}/{len(repo_urls)} repo_urls")
+
+    # Ensure we don't duplicate an existing 'cited' column: drop it if present
+    fieldnames = [fn for fn in fieldnames if fn != "cited"]
 
     # Add cited column next to repo_url
     new_fieldnames = []
@@ -78,6 +93,8 @@ def process_csv(csv_path, workers, log_every, decoded_dir):
 
     # Update rows with cited info
     for row in rows:
+        if row.get("cited") and row.get("cited") == "1":
+            continue
         row["cited"] = str(cited_map.get(row["repo_url"], 0))
 
     # Write back to CSV
@@ -91,21 +108,21 @@ def main():
     args = parse_args()
     input_dir = Path(args.input_dir)
     if not input_dir.is_dir():
-        print(f"Input directory {input_dir} does not exist or is not a directory.")
+        log(f"Input directory {input_dir} does not exist or is not a directory.")
         return
 
     csv_files = list(input_dir.glob("*.csv"))
     if not csv_files:
-        print(f"No CSV files found in {input_dir}")
+        log(f"No CSV files found in {input_dir}")
         return
 
     decoded_dir = Path(args.input_dir2)
     if not decoded_dir.is_dir():
-        print(f"Input directory {decoded_dir} does not exist or is not a directory.")
+        log(f"Input directory {decoded_dir} does not exist or is not a directory.")
         return
 
     for csv_file in csv_files:
-        print(f"Processing {csv_file.name} ...")
+        log(f"Processing {csv_file.name} ...")
         process_csv(csv_file, args.workers, args.log_every, decoded_dir)
 
 if __name__ == "__main__":

@@ -24,10 +24,6 @@ def check_apktool() -> bool:
     except FileNotFoundError:
         return False
 
-def extract_sha256_from_name(p: Path) -> str | None:
-    m = APK_SHA256_RE.search(p.name)
-    return m.group(1).lower() if m else None
-
 def is_already_decoded(outdir: Path) -> bool:
     # Heuristic: main folder exists and has expected files/folders
     if not outdir.exists():
@@ -43,20 +39,17 @@ def is_already_decoded(outdir: Path) -> bool:
         return False
 
 def decode_one(apk_path: Path, decoded_root: Path, force: bool, quiet: bool) -> tuple[str, bool, str]:
-    """Return (sha256, success, message)."""
-    sha = extract_sha256_from_name(apk_path)
-    if not sha:
-        return ("", False, f"Skip {apk_path.name}: cannot find 64-hex sha256 in filename")
-
-    outdir = decoded_root / sha
+    """Return (pkg_name, success, message)."""
+    pkg_name = apk_path.stem
+    outdir = decoded_root / pkg_name
     if is_already_decoded(outdir) and not force:
-        return (sha, True, "already decoded (skipped)")
+        return (pkg_name, True, "already decoded (skipped)")
 
     if outdir.exists() and force:
         try:
             shutil.rmtree(outdir)
         except Exception as e:
-            return (sha, False, f"failed to remove existing dir: {e}")
+            return (pkg_name, False, f"failed to remove existing dir: {e}")
 
     # apktool decode
     # -f: force overwrite inside output dir (we already removed if force)
@@ -74,19 +67,19 @@ def decode_one(apk_path: Path, decoded_root: Path, force: bool, quiet: bool) -> 
                     shutil.rmtree(outdir)
             except Exception:
                 pass
-            return (sha, False, f"apktool error: {proc.stderr.strip()[:500]}")
+            return (pkg_name, False, f"apktool error: {proc.stderr.strip()[:500]}")
     except Exception as e:
         try:
             if outdir.exists() and not is_already_decoded(outdir):
                 shutil.rmtree(outdir)
         except Exception:
             pass
-        return (sha, False, f"exception: {e}")
+        return (pkg_name, False, f"exception: {e}")
 
-    return (sha, True, "decoded")
+    return (pkg_name, True, "decoded")
 
 def main():
-    ap = argparse.ArgumentParser(description="Decode APKs with apktool into ./decoded/{sha256}")
+    ap = argparse.ArgumentParser(description="Decode APKs with apktool into ./decoded/{pkg_name}")
     ap.add_argument("--input-dir", default="apks", help="Directory containing APK files (default: ./apks)")
     ap.add_argument("--output-dir", default="decoded", help="Output root for decoded folders (default: ./decoded)")
     ap.add_argument("--limit", type=int, default=100, help="Max APKs to process (default 100)")
@@ -135,7 +128,7 @@ def main():
         with ThreadPoolExecutor(max_workers=args.workers) as ex:
             futs = {ex.submit(decode_one, p, decoded_root, args.force, args.quiet): p for p in apks}
             for fut in as_completed(futs):
-                sha, success, msg = fut.result()
+                pkg_name, success, msg = fut.result()
                 processed += 1
                 if "already decoded" in msg:
                     skipped += 1
@@ -146,10 +139,10 @@ def main():
                 if processed % args.log_every == 0:
                     log(f"Processed={processed}  OK={ok}  Skipped={skipped}  Failed={failed}")
                 if not success:
-                    log(f"  {sha or futs[fut].name}: {msg}")
+                    log(f"  {pkg_name or futs[fut].name}: {msg}")
     else:
         for p in apks:
-            sha, success, msg = decode_one(p, decoded_root, args.force, args.quiet)
+            pkg_name, success, msg = decode_one(p, decoded_root, args.force, args.quiet)
             processed += 1
             if "already decoded" in msg:
                 skipped += 1
@@ -157,7 +150,7 @@ def main():
                 ok += 1
             else:
                 failed += 1
-                log(f"  {sha or p.name}: {msg}")
+                log(f"  {pkg_name or p.name}: {msg}")
             if processed % args.log_every == 0:
                 log(f"Processed={processed}  OK={ok}  Skipped={skipped}  Failed={failed}")
 

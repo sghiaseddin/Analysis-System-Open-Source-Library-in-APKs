@@ -1,3 +1,6 @@
+# ---------- JS/TS License Header Parser ----------
+from typing import Dict, List
+
 #!/usr/bin/env python3
 import argparse
 import csv
@@ -66,7 +69,7 @@ NPM_KEYS = ["name", "version", "license", "author", "repository", "homepage"]
 # CSV columns
 CSV_HEADERS = [
     # Note: The column name 'libarary_key' intentionally follows the user's provided header (even though it looks like a misspelling).
-    "app_sha256", "libarary_key", "library_name", "version", "license_id", "license_name", "license_url", "author", "homepage",
+    "pkg_name", "libarary_key", "library_name", "version", "license_id", "license_name", "license_url", "author", "homepage",
     "repo_url", "found_by", "file_path", "evidence_excerpt"
 ]
 
@@ -104,7 +107,26 @@ def first_url(text: str) -> Optional[str]:
     if not text:
         return None
     m = URL_RE.search(text)
-    return m.group(1) if m else None
+    url = m.group(1) if m else None
+    if url:
+        # Skip common useless or invalid URLs
+        bad_prefixes = ("http://www.w3.org", "data:")
+        if any(url.startswith(p) for p in bad_prefixes):
+            return None
+        # Basic domain-style validation (e.g. http(s)://domain.tld/...)
+        if not re.match(r"https?://[a-zA-Z0-9\-_.]+\.[a-zA-Z]{2,6}(/|$)", url):
+            return None
+        # Remove fragments, queries, trailing paths (e.g. wiki pages, raw files)
+        if "github.com/" in url:
+            parts = url.split("github.com/")[-1].split("/")
+            if len(parts) >= 2:
+                url = f"https://github.com/{parts[0]}/{parts[1]}"
+        elif "raw.githubusercontent.com/" in url:
+            # Convert raw GitHub URLs to repo base
+            parts = url.split("raw.githubusercontent.com/")[-1].split("/")
+            if len(parts) >= 3:
+                url = f"https://github.com/{parts[0]}/{parts[1]}"
+    return url
 
 # Heuristic: is this file probably text (by extension or content sample)?
 def is_probably_text(p: Path, sample_bytes: int = 4096) -> bool:
@@ -148,7 +170,7 @@ def parse_generic_text(text: str, app_sha: str, file_path: str) -> List[Dict[str
             repo_name = "/".join(parts[-2:])
             lic = detect_license(text) or ""
             row = {
-                "app_sha256": app_sha,
+                "pkg_name": app_sha,
                 "libarary_key": repo_name,
                 "library_name": repo_name,
                 "version": "",
@@ -167,7 +189,7 @@ def parse_generic_text(text: str, app_sha: str, file_path: str) -> List[Dict[str
     lic = detect_license(text)
     if lic:
         row = {
-            "app_sha256": app_sha,
+            "pkg_name": app_sha,
             "libarary_key": "",
             "library_name": "",
             "version": "",
@@ -207,7 +229,7 @@ def parse_gradle(text: str, app_sha: str, file_path: str) -> List[Dict[str, str]
         lib_name = f"{g}:{a}"
         lic = detect_license(text) or ""
         row = {
-            "app_sha256": app_sha,
+            "pkg_name": app_sha,
             "libarary_key": f"{g}:{a}",
             "library_name": lib_name,
             "version": v,
@@ -252,7 +274,7 @@ def parse_maven_pom(text: str, app_sha: str, file_path: str) -> List[Dict[str, s
     lib_display = name or (f"{groupId}:{artifactId}" if groupId and artifactId else artifactId or groupId)
     if lib_display:
         row = {
-            "app_sha256": app_sha,
+            "pkg_name": app_sha,
             "libarary_key": (f"{groupId}:{artifactId}" if groupId and artifactId else lib_display),
             "library_name": lib_display,
             "version": version,
@@ -296,7 +318,7 @@ def parse_license_like(text: str, app_sha: str, file_path: str) -> List[Dict[str
 
     if candidate_name or license_name or candidate_url:
         row = {
-            "app_sha256": app_sha,
+            "pkg_name": app_sha,
             "libarary_key": (candidate_name or "").lower(),
             "library_name": candidate_name,
             "version": "",
@@ -329,7 +351,7 @@ def parse_package_json(text: str, app_sha: str, file_path: str) -> List[Dict[str
     homepage = str(data.get("homepage","") or "")
     repo = data.get("repository","")
     if isinstance(repo, dict):
-        repo = repo.get("url","") or ""
+        repo = repo.get("url","") or repo.get("repourl","") or repo.get("repo_url","") or ""
     repo = str(repo)
 
     # Add the top-level package.json (itself OSS?) — usually internal, so we *don't* include it by itself.
@@ -340,7 +362,7 @@ def parse_package_json(text: str, app_sha: str, file_path: str) -> List[Dict[str
         if isinstance(deps, dict):
             for dep_name, dep_ver in deps.items():
                 row = {
-                    "app_sha256": app_sha,
+                    "pkg_name": app_sha,
                     "libarary_key": dep_name,
                     "library_name": dep_name,
                     "version": str(dep_ver),
@@ -368,7 +390,7 @@ def parse_requirements(text: str, app_sha: str, file_path: str) -> List[Dict[str
         if m:
             name, _, ver = m.groups()
             row = {
-                "app_sha256": app_sha,
+                "pkg_name": app_sha,
                 "libarary_key": name,
                 "library_name": name,
                 "version": ver,
@@ -387,7 +409,7 @@ def parse_requirements(text: str, app_sha: str, file_path: str) -> List[Dict[str
             # plain pkg name
             if re.match(r"^[A-Za-z0-9_.-]+$", ln):
                 row = {
-                    "app_sha256": app_sha,
+                    "pkg_name": app_sha,
                     "libarary_key": ln,
                     "library_name": ln,
                     "version": "",
@@ -402,6 +424,60 @@ def parse_requirements(text: str, app_sha: str, file_path: str) -> List[Dict[str
                     "evidence_excerpt": ln[:240]
                 }
                 out.append(row)
+    return out
+
+
+# ---------- 3rdpartylicenses.txt parser ----------
+def parse_3rdpartylicenses(text: str, app_sha: str, file_path: str) -> List[Dict[str, str]]:
+    """Parse files like '3rdpartylicenses.txt' used by some bundlers."""
+    out = []
+    if not text:
+        return out
+
+    # Split by long separator lines (e.g., '--------') or multiple newlines
+    blocks = re.split(r"[-=]{10,}|(?:\n\s*){2,}", text)
+
+    for block in blocks:
+        if not block.strip():
+            continue
+
+        lines = block.strip().splitlines()
+        license_name = detect_license(block) or ""
+        url = first_url(block) or ""
+        pkg_name = ""
+        author = ""
+
+        for line in lines:
+            low = line.lower()
+            if low.startswith("package:") or low.startswith("library:"):
+                pkg_name = line.split(":", 1)[-1].strip()
+            elif low.startswith("license:"):
+                val = line.split(":", 1)[-1].strip().strip('"\'')
+                license_name = val if val else license_name
+            elif "copyright" in low:
+                # try to capture after © or (c) or "by"
+                match = re.search(r"(?:©|\(c\)|copyright\s*\(c\)?|\bcopyright\b)[^\n:]*[:)]?\s*(.*)", line, re.I)
+                if match:
+                    author = match.group(1).strip()
+
+        if pkg_name and license_name:
+            row = {
+                "pkg_name": app_sha,
+                "libarary_key": pkg_name,
+                "library_name": pkg_name,
+                "version": "",
+                "license_id": license_name,
+                "license_name": license_name,
+                "license_url": "",
+                "author": author,
+                "homepage": url,
+                "repo_url": url,
+                "found_by": "3rdpartylicenses",
+                "file_path": file_path,
+                "evidence_excerpt": block[:240].replace("\n", " ")
+            }
+            out.append(row)
+
     return out
 
 def parse_google_oss_bundles(dir_path: Path, app_sha: str) -> List[Dict[str, str]]:
@@ -430,7 +506,7 @@ def parse_google_oss_bundles(dir_path: Path, app_sha: str) -> List[Dict[str, str
                     name = str((obj.get("name") if isinstance(obj, dict) else "") or "").strip()
                     if name:
                         row = {
-                            "app_sha256": app_sha,
+                            "pkg_name": app_sha,
                             "libarary_key": name,
                             "library_name": name,
                             "version": "",
@@ -458,7 +534,7 @@ def parse_google_oss_bundles(dir_path: Path, app_sha: str) -> List[Dict[str, str
                 name = ln.split(":", 1)[0].strip()
                 if name and len(name) > 1 and len(name) < 200:
                     row = {
-                        "app_sha256": app_sha,
+                        "pkg_name": app_sha,
                         "libarary_key": name,
                         "library_name": name,
                         "version": "",
@@ -475,8 +551,171 @@ def parse_google_oss_bundles(dir_path: Path, app_sha: str) -> List[Dict[str, str
                     safe_add(row, out)
     return out
 
+# ---------- New parser: all JSON licenses ----------
+def parse_all_json_licenses(app_dir: Path, pkg_name: str) -> List[Dict[str, str]]:
+    """
+    Recursively scan all .json files for license-like keys and extract associated info.
+    """
+    results = []
+    license_keys = {"license", "licensename", "licenseName", "license_name", "lisence", "lisense"}
+
+    def recursive_search(obj, parent_keys=None):
+        if parent_keys is None:
+            parent_keys = []
+        matches = []
+        if isinstance(obj, dict):
+            for k, v in obj.items():
+                lower_k = k.lower()
+                if lower_k in license_keys:
+                    sibling_data = {**obj}
+                    matches.append((k, v, sibling_data))
+                elif isinstance(v, (dict, list)):
+                    matches.extend(recursive_search(v, parent_keys + [k]))
+        elif isinstance(obj, list):
+            for idx, item in enumerate(obj):
+                matches.extend(recursive_search(item, parent_keys + [str(idx)]))
+        return matches
+
+    for json_file in app_dir.rglob("*.json"):
+        if not json_file.is_file():
+            continue
+        try:
+            with json_file.open("r", encoding="utf-8") as f:
+                data = json.load(f)
+        except Exception:
+            continue
+        try:
+            matches = recursive_search(data)
+            for key, license_val, context in matches:
+                lib_name = context.get("name", "")
+                version = context.get("version", "")
+                license_url = context.get("licenseUrl", "") or context.get("license_url", "") or ""
+                url = context.get("url", "") or context.get("repoUrl", "") or context.get("repo_url", "") or context.get("repository", "") or ""
+                author = context.get("author", "") or context.get("copyrightHolder", "") or ""
+                license_id = detect_license(str(license_val)) or detect_license(str(context.get("license", ""))) or ""
+                row = {
+                    "pkg_name": pkg_name,
+                    "libarary_key": lib_name or url,
+                    "library_name": lib_name,
+                    "version": version,
+                    "license_id": license_id,
+                    "license_name": str(license_val),
+                    "license_url": license_url,
+                    "author": author,
+                    "homepage": url,
+                    "repo_url": url,
+                    "found_by": "json_license_heuristic",
+                    "file_path": str(json_file),
+                    "evidence_excerpt": str(context)[:240]
+                }
+                results.append(row)
+        except Exception as e:
+            log(f"Failed to process {json_file}: {e}")
+    return results
+
+def parse_js_license_comment(text: str, pkg_name: str, file_path: str) -> List[Dict[str, str]]:
+    """
+    Extract license metadata from JS/TS file headers.
+
+    Heuristics applied:
+    - Inspect first N lines (header comment block).
+    - Detect SPDX-like license names and license URLs.
+    - Look for copyright/author lines and common labels (Author:, Copyright, ©, By ).
+    - Detect module/plugin namespaces from patterns like `cordova.define("ns.Name"`) or `define("...")` and infer a library key.
+    - Fallbacks: use @overview, @version, or first URL in header as hints.
+    """
+    results: List[Dict[str, str]] = []
+    if not text:
+        return results
+
+    header_lines = text.splitlines()[:120]
+    # Skip minified JS/TS with too few lines (likely no license header)
+    if len(header_lines) < 10:
+        return results
+    header = "\n".join(header_lines)
+
+    # license detection
+    license_id = detect_license(header)
+    license_url = first_url(header)
+
+    # author detection heuristics
+    author = ""
+    for ln in header_lines:
+        l = ln.strip()
+        low = l.lower()
+        # explicit 'Author: Name' label
+        if low.startswith("author:"):
+            author = l.split(":", 1)[1].strip()
+            break
+        # 'maintainer:' or similar
+        if low.startswith("maintainer:") or low.startswith("copyright holder:"):
+            author = l.split(":", 1)[1].strip()
+            break
+        # common copyright patterns -> try to capture name after the year or ©
+        if "copyright" in low or "©" in l or "licensed to" in low:
+            # Remove 'copyright', '(c)', years, and URLs to isolate name
+            cleaned = re.sub(r"(?i)copyright|\\(c\\)|©|[0-9]{2,4}|http[s]?://\\S+", "", l)
+            cleaned = cleaned.strip(" -*")
+            if cleaned:
+                author = cleaned.strip()
+                break
+            # 'by Name' patterns
+            m2 = re.search(r"by\\s+([A-Za-z0-9 .,_&\\-]{2,80})", l, re.I)
+            if m2:
+                author = m2.group(1).strip()
+                break
+
+    # namespace / project detection heuristics
+    project_name = ""
+    m = re.search(r'\.define\(["\']([A-Za-z0-9_\-\.]+)\.', header)
+    if m:
+        project_name = m.group(1)
+    else:
+        # generic define('pkg.name' ...) or define("pkg.name"
+        m2 = re.search(r'define\(["\']([A-Za-z0-9_\-\.]+)["\']', header)
+        if m2:
+            project_name = m2.group(1)
+        else:
+            # check for common tags like @overview or @name
+            m3 = re.search(r'@overview\\s+([A-Za-z0-9_\\-\\. ]{2,120})', header, re.I)
+            if m3:
+                project_name = m3.group(1).strip()
+            else:
+                m4 = re.search(r'@name\\s+([A-Za-z0-9_\\-\\. ]{2,120})', header, re.I)
+                if m4:
+                    project_name = m4.group(1).strip()
+
+    # best-effort library key and display name
+    if license_url and "github.com/" in license_url:
+        lib_key = license_url.split("github.com/")[-1].strip("/")
+    else:
+        lib_key = project_name or Path(file_path).stem
+
+    lib_display = project_name or Path(file_path).stem
+
+    # Only add a result if we found a license signal, url, author or project name
+    if license_id or license_url or author or project_name:
+        row = {
+            "pkg_name": pkg_name,
+            "libarary_key": lib_key,
+            "library_name": lib_display,
+            "version": "",
+            "license_id": license_id or "",
+            "license_name": license_id or "",
+            "license_url": license_url or "",
+            "author": author or "",
+            "homepage": "",
+            "repo_url": license_url if license_url and "github.com" in license_url else "",
+            "found_by": "js_license_header",
+            "file_path": file_path,
+            "evidence_excerpt": header[:400],
+        }
+        results.append(row)
+
+    return results
+
 # ---------- Main scan ----------
-def deep_scan_all_text(app_dir: Path, app_sha: str, max_files: int, exclude_patterns: List[str]) -> List[Dict[str, str]]:
+def deep_scan_all_text(app_dir: Path, pkg_name: str, max_files: int, exclude_patterns: List[str]) -> List[Dict[str, str]]:
     results: List[Dict[str, str]] = []
     scanned = 0
     for f in app_dir.rglob("*"):
@@ -500,31 +739,40 @@ def deep_scan_all_text(app_dir: Path, app_sha: str, max_files: int, exclude_patt
         # Try specific parsers based on filename
         name = f.name.lower()
         if name.startswith("build.gradle"):
-            for row in parse_gradle(text, app_sha, str(f)):
+            for row in parse_gradle(text, pkg_name, str(f)):
                 safe_add(row, results)
         elif name == "pom.xml":
-            for row in parse_maven_pom(text, app_sha, str(f)):
+            for row in parse_maven_pom(text, pkg_name, str(f)):
                 safe_add(row, results)
         elif name == "package.json":
-            for row in parse_package_json(text, app_sha, str(f)):
+            for row in parse_package_json(text, pkg_name, str(f)):
                 safe_add(row, results)
         elif name == "requirements.txt":
-            for row in parse_requirements(text, app_sha, str(f)):
+            for row in parse_requirements(text, pkg_name, str(f)):
+                safe_add(row, results)
+        elif f.suffix.lower() in [".txt", "md"]:
+            for row in parse_3rdpartylicenses(text, pkg_name, str(f)):
+                safe_add(row, results)
+        elif f.suffix.lower() in [".js", ".ts"]:
+            for row in parse_js_license_comment(text, pkg_name, str(f)):
                 safe_add(row, results)
         else:
             # generic content scan (SPDX, git URLs, gradle coords inside any text)
-            for row in parse_generic_text(text, app_sha, str(f)):
+            for row in parse_generic_text(text, pkg_name, str(f)):
                 safe_add(row, results)
         scanned += 1
     return results
 
-def scan_one_app(app_dir: Path, sha256: str, max_files: int, exclude_patterns: List[str]) -> List[Dict[str, str]]:
+def scan_one_app(app_dir: Path, pkg_name: str, max_files: int, exclude_patterns: List[str]) -> List[Dict[str, str]]:
     results: List[Dict[str, str]] = []
 
-    # 1) Google OSS bundles (fast)
-    results.extend(parse_google_oss_bundles(app_dir, sha256))
+    # 1) all JSON licenses (recursively)
+    results.extend(parse_all_json_licenses(app_dir, pkg_name))
 
-    # 2) Traverse likely dirs first
+    # 2) Google OSS bundles (fast)
+    results.extend(parse_google_oss_bundles(app_dir, pkg_name))
+
+    # 3) Traverse likely dirs first
     visited = set()
     for sub in LIKELY_DIRS:
         p = (app_dir / sub).resolve()
@@ -539,7 +787,7 @@ def scan_one_app(app_dir: Path, sha256: str, max_files: int, exclude_patterns: L
                     if not text:
                         continue
                     # Parse generic license-ish file
-                    for row in parse_license_like(text, sha256, str(f)):
+                    for row in parse_license_like(text, pkg_name, str(f)):
                         safe_add(row, results)
 
             # Dependency files
@@ -551,36 +799,36 @@ def scan_one_app(app_dir: Path, sha256: str, max_files: int, exclude_patterns: L
                         continue
                     if f.name.startswith("build.gradle"):
                         pass
-                        for row in parse_gradle(text, sha256, str(f)):
+                        for row in parse_gradle(text, pkg_name, str(f)):
                             safe_add(row, results)
                     elif f.name == "pom.xml":
-                        for row in parse_maven_pom(text, sha256, str(f)):
+                        for row in parse_maven_pom(text, pkg_name, str(f)):
                             safe_add(row, results)
                     elif f.name == "package.json":
-                        for row in parse_package_json(text, sha256, str(f)):
+                        for row in parse_package_json(text, pkg_name, str(f)):
                             safe_add(row, results)
                     elif f.name == "requirements.txt":
-                        for row in parse_requirements(text, sha256, str(f)):
+                        for row in parse_requirements(text, pkg_name, str(f)):
                             safe_add(row, results)
 
-    # 3) Shallow project root scan for leftover license-ish names
+    # 4) Shallow project root scan for leftover license-ish names
     for f in app_dir.iterdir():
         if f.is_file():
             name = f.name.lower()
             if any(k in name for k in ["license", "notice", "third", "oss", "open_source"]):
                 text = read_text_safely(f)
                 if text:
-                    for row in parse_license_like(text, sha256, str(f)):
+                    for row in parse_license_like(text, pkg_name, str(f)):
                         safe_add(row, results)
 
-    # 4) Deep fallback: scan text-like files across entire tree for embedded coordinates, URLs, or licenses
-    results.extend(deep_scan_all_text(app_dir, sha256, max_files=max_files, exclude_patterns=exclude_patterns))
+    # 5) Deep fallback: scan text-like files across entire tree for embedded coordinates, URLs, or licenses
+    results.extend(deep_scan_all_text(app_dir, pkg_name, max_files=max_files, exclude_patterns=exclude_patterns))
 
     return results
 
-def write_app_csv(out_dir: Path, sha256: str, rows: List[Dict[str, str]]):
+def write_app_csv(out_dir: Path, pkg_name: str, rows: List[Dict[str, str]]):
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_path = out_dir / f"{sha256}.csv"
+    out_path = out_dir / f"{pkg_name}.csv"
     with open(out_path, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=CSV_HEADERS)
         w.writeheader()
@@ -590,8 +838,8 @@ def write_app_csv(out_dir: Path, sha256: str, rows: List[Dict[str, str]]):
                 r.setdefault(k, "")
             w.writerow(r)
 
-def already_done(out_dir: Path, sha256: str) -> bool:
-    return (out_dir / f"{sha256}.csv").exists()
+def already_done(out_dir: Path, pkg_name: str) -> bool:
+    return (out_dir / f"{pkg_name}.csv").exists()
 
 def main():
     ap = argparse.ArgumentParser(description="Extract third-party OSS inventory from decoded APKs into per-app CSVs.")
@@ -611,7 +859,7 @@ def main():
         print(f"ERROR: input directory not found: {input_dir}", file=sys.stderr)
         sys.exit(1)
 
-    # Gather app dirs: input_dir/<sha256>
+    # Gather app dirs: input_dir/<pkg_name>
     app_dirs = [p for p in sorted(input_dir.iterdir()) if p.is_dir()]
     if args.limit and len(app_dirs) > args.limit:
         app_dirs = app_dirs[:args.limit]
@@ -627,17 +875,17 @@ def main():
     skipped = 0
 
     for app_dir in app_dirs:
-        sha256 = app_dir.name
+        pkg_name = app_dir.name
         processed += 1
 
-        if already_done(output_dir, sha256) and not args.force:
+        if already_done(output_dir, pkg_name) and not args.force:
             skipped += 1
             if processed % args.log_every == 0:
                 log(f"Processed={processed}  Written={written}  Skipped={skipped}")
             continue
 
-        rows = scan_one_app(app_dir, sha256, max_files=max_files, exclude_patterns=exclude_patterns)
-        write_app_csv(output_dir, sha256, rows)
+        rows = scan_one_app(app_dir, pkg_name, max_files=max_files, exclude_patterns=exclude_patterns)
+        write_app_csv(output_dir, pkg_name, rows)
         written += 1
 
         if processed % args.log_every == 0:

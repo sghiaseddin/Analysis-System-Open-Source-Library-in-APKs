@@ -7,12 +7,12 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 def log(m): print(f"[{datetime.now().strftime('%H:%M:%S')}] {m}", flush=True)
 
-# Columns in reports/<sha>.csv written by match_fingerprints_in_apks.py:
-# app_sha256, repo_host, repo_path, repo_url, libarary_key, library_name,
+# Columns in reports/<pkg_name>.csv written by match_fingerprints_in_apks.py:
+# pkg_name, repo_host, repo_path, repo_url, libarary_key, library_name,
 # smali_prefix, fingerprint_type, class, class_file
 
 SUMMARY_HEADERS = [
-    "app_sha256",
+    "pkg_name",
     "repo_host",
     "repo_path",
     "repo_url",
@@ -26,11 +26,11 @@ SUMMARY_HEADERS = [
 ]
 
 def summarize_one(report_csv: Path, out_dir: Path, force: bool = False) -> tuple[str, int]:
-    sha = report_csv.stem
+    pkg_name = report_csv.stem
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_csv = out_dir / f"{sha}.csv"
+    out_csv = out_dir / f"{pkg_name}.csv"
     if out_csv.exists() and not force:
-        return sha, -1  # skipped
+        return pkg_name, -1  # skipped
 
     # aggregate by library identity
     # key = (repo_host, repo_path, libarary_key, library_name, smali_prefix)
@@ -68,7 +68,7 @@ def summarize_one(report_csv: Path, out_dir: Path, force: bool = False) -> tuple
             if agg["sample"]:
                 sample_class, sample_file = agg["sample"]
             w.writerow([
-                sha,
+                pkg_name,
                 repo_host,
                 repo_path,
                 repo_url_by_key.get((repo_host, repo_path, libkey, libname, smali_prefix), ""),
@@ -81,7 +81,7 @@ def summarize_one(report_csv: Path, out_dir: Path, force: bool = False) -> tuple
                 sample_file
             ])
 
-    return sha, len(buckets)
+    return pkg_name, len(buckets)
 
 def main():
     ap = argparse.ArgumentParser(description="Summarize per-app fingerprint matches to one row per library.")
@@ -113,7 +113,7 @@ def main():
         with ThreadPoolExecutor(max_workers=args.workers) as ex:
             futs = [ex.submit(work, p) for p in report_files]
             for i, fut in enumerate(as_completed(futs), 1):
-                sha, n = fut.result()
+                pkg_name, n = fut.result()
                 processed += 1
                 if n == -1:
                     skipped += 1
@@ -123,7 +123,7 @@ def main():
                     log(f"Processed {processed}/{len(report_files)}  summaries written={written}  skipped={skipped}")
     else:
         for i, p in enumerate(report_files, 1):
-            sha, n = work(p)
+            pkg_name, n = work(p)
             processed += 1
             if n == -1:
                 skipped += 1

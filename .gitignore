@@ -3,6 +3,7 @@ __pycache__/
 *.so
 *.pyo
 *.pyd
+.ipynb_checkpoints/
 
 # Virtual environment
 .venv/
@@ -24,6 +25,7 @@ push-to-github.sh
 /database/
 /reports/
 /summary-reports/
+/aggregate-reports/
 
 # IDE/editor settings
 .vscode/

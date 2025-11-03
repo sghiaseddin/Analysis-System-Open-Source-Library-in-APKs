@@ -8,6 +8,7 @@ import subprocess
 from pathlib import Path
 from datetime import datetime
 from urllib.parse import urlparse
+import requests
 
 SUPPORTED_HOSTS = {"github.com", "gitlab.com", "bitbucket.org"}
 
@@ -49,7 +50,7 @@ def extract_host_repo_path(url: str):
 
     # On GitLab, allow nested groups before repo (keep entire path),
     # On GitHub/Bitbucket, usually owner/repo; if extra segments present, keep first two.
-    if host in {"github.com", "bitbucket.org"}:
+    if host in {"github.com", "gitlab.com", "bitbucket.org"}:
         repo_path = "/".join(segs[:2])
     else:
         repo_path = "/".join(segs)
@@ -59,7 +60,54 @@ def extract_host_repo_path(url: str):
     return host, repo_path
 
 def repo_local_path(outdir: Path, host: str, repo_path: str) -> Path:
+    # Local path based on canonical host/repo_path structure
     return outdir / host / repo_path
+
+def resolve_repo_root(url: str, timeout: int = 6) -> tuple[str, str, str]:
+    """Try to resolve a repository root URL for supported hosts.
+
+    Returns (final_url, host, repo_path). If unable to resolve, returns the normalized input.
+    """
+    if not url:
+        return url, None, None
+    norm = normalize_repo_url(url)
+    parts = urlparse(norm)
+    host = parts.netloc.lower()
+    path = parts.path.strip("/")
+    segs = [s for s in path.split("/") if s]
+    # If path already minimal (owner/repo) just return
+    if len(segs) >= 2:
+        if host in {"github.com", "gitlab.com", "bitbucket.org"}:
+            repo_path = "/".join(segs[:2])
+        else:
+            repo_path = "/".join(segs)
+    else:
+        return norm, host, None
+
+    candidate = f"https://{host}/{repo_path}"
+    try:
+        # Prefer HEAD, fall back to GET if HEAD not allowed
+        r = requests.head(candidate, allow_redirects=True, timeout=timeout)
+        if r.status_code >= 200 and r.status_code < 400:
+            return candidate, host, repo_path
+        r = requests.get(candidate, allow_redirects=True, timeout=timeout)
+        if r.status_code >= 200 and r.status_code < 400:
+            return candidate, host, repo_path
+    except Exception:
+        pass
+
+    # If original URL contained deeper path (like /tree/ or /blob/), attempt to peel segments
+    for i in range(len(segs), 1, -1):
+        attempt = "/".join(segs[:i])
+        candidate = f"https://{host}/{attempt}"
+        try:
+            r = requests.head(candidate, allow_redirects=True, timeout=timeout)
+            if r.status_code >= 200 and r.status_code < 400:
+                return candidate, host, attempt
+        except Exception:
+            continue
+    # fallback to normalized url
+    return norm, host, repo_path
 
 def git_clone(url: str, dest: Path, force: bool = False, depth: int = 1) -> tuple[bool, str]:
     if dest.exists():
@@ -110,6 +158,8 @@ def enumerate_repo_urls(library_lists_dir: Path, max_files: int | None = None):
                     if not url:
                         url = (row.get("homepage") or "").strip()
                     if not url:
+                        url = (row.get("license_url") or "").strip()
+                    if not url:
                         continue
                     yield url
         except Exception:
@@ -136,28 +186,58 @@ def main():
     outdir = Path(args.output_dir)
     outdir.mkdir(parents=True, exist_ok=True)
 
+    manifest_path = Path(args.output_data)
+    manifest_rows = {}
+    if manifest_path.exists():
+        try:
+            with manifest_path.open('r', encoding='utf-8', newline='') as mf:
+                rdr = csv.DictReader(mf)
+                for r in rdr:
+                    k = (r.get('host',''), r.get('repo_path',''))
+                    manifest_rows[k] = r
+        except Exception:
+            manifest_rows = {}
+    else:
+        # create header file
+        with manifest_path.open('w', encoding='utf-8', newline='') as f:
+            w = csv.writer(f)
+            w.writerow(["host","repo_path","url","local_path","status","message","last_seen"])
+
     # Collect and normalize repo URLs → canonical keys (host + repo_path)
     seen = {}
     total_seen = 0
     for url in enumerate_repo_urls(library_lists_dir, max_files=(args.file_limit or None)):
-        host, repo_path = extract_host_repo_path(url)
-        if not host:
+        # Filter unsupported hosts early
+        tmp_norm = normalize_repo_url(url)
+        tmp_parts = urlparse(tmp_norm)
+        tmp_host = tmp_parts.netloc.lower()
+        if tmp_host not in SUPPORTED_HOSTS:
             continue
-        key = (host, repo_path)
-        if key not in seen:
-            seen[key] = normalize_repo_url(url)
+
         total_seen += 1
+        if not url:
+            continue
+        # try to resolve to repo root
+        final_url, host, repo_path = resolve_repo_root(url)
+        if not host or not repo_path:
+            # try to extract using existing helper
+            host2, repo_path2 = extract_host_repo_path(url)
+            if not host2 or not repo_path2:
+                continue
+            host, repo_path = host2, repo_path2
+            final_url = normalize_repo_url(url)
+
+        key = (host, repo_path)
+        if key in manifest_rows:
+            continue  # Already in manifest, skip cloning
+        if key not in seen:
+            seen[key] = final_url
 
     repos = list(seen.items())
     if args.limit and len(repos) > args.limit:
         repos = repos[:args.limit]
 
     log(f"Found {len(repos)} unique public repos ({total_seen} urls scanned).")
-    manifest_path = Path(args.output_data)
-    if not manifest_path.exists():
-        with manifest_path.open("w", encoding="utf-8", newline="") as f:
-            w = csv.writer(f)
-            w.writerow(["host","repo_path","url","local_path","status","message"])
 
     # Clone (optionally parallel)
     from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -184,11 +264,29 @@ def main():
             if i % args.log_every == 0:
                 log(f"Cloned {i}/{len(repos)}")
 
-    # Append to manifest
-    with manifest_path.open("a", encoding="utf-8", newline="") as f:
-        w = csv.writer(f)
-        for host, repo_path, url, dest, status, msg in results:
-            w.writerow([host, repo_path, url, dest, status, msg])
+    # Update manifest_rows with latest results
+    for host, repo_path, url, dest, status, msg in results:
+        k = (host, repo_path)
+        if k in manifest_rows:
+            # Already present, skip to avoid duplicates
+            continue
+        rec = manifest_rows.get(k, {})
+        rec['host'] = host
+        rec['repo_path'] = repo_path
+        rec['url'] = url
+        rec['local_path'] = dest
+        rec['status'] = status
+        rec['message'] = msg
+        rec['last_seen'] = datetime.utcnow().isoformat()
+        manifest_rows[k] = rec
+
+    # Write full manifest back (overwrite)
+    with manifest_path.open('w', encoding='utf-8', newline='') as mf:
+        fieldnames = ["host","repo_path","url","local_path","status","message","last_seen"]
+        w = csv.DictWriter(mf, fieldnames=fieldnames)
+        w.writeheader()
+        for k in sorted(manifest_rows.keys()):
+            w.writerow(manifest_rows[k])
 
     # Summary
     ok_count = sum(1 for r in results if r[4] in ("ok","exists","dry_run"))

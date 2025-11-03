@@ -2,7 +2,7 @@
 
 This is a pipeline to research open source libraries used within a corpus of Android APKs. The system is designed for large-scale analysis using [AndroZoo](https://androzoo.uni.lu/) data and aims to detect library usage through static analysis and fingerprint matching.
 
-Version: 0.1.1
+Version: 0.2.0
 
 ---
 
@@ -21,8 +21,8 @@ The primary goal is to detect open source libraries in **latest-version Android 
 
 ### 2. **APK Selection and Tagging**
 
-- **Source**: AndroZoo Metadata API
-- **Purpose**: Classify APKs by categories using Ollama LLM.
+- **Source**: Google Play
+- **Purpose**: Classify APKs by categories using scraper gathering data from Google Play
 
 ### 3. **APK Downloading**
 
@@ -61,6 +61,11 @@ The primary goal is to detect open source libraries in **latest-version Android 
 - **Purpose**: Again check each decoded app with found liceses (repo_url lookup).
 - **Output**: Added `cited` column to `summary-reports/[app].csv` as boolean.
 
+### 11. **License Check**
+
+- **Purpose**: Again check each license declaration in the `/license_lists/`.
+- **Output**: Added `origin` column to `aggregate-reports/[app].csv`.
+
 ---
 
 ## Output Files
@@ -76,6 +81,7 @@ The primary goal is to detect open source libraries in **latest-version Android 
 | `fingerprints.csv`    | Fingerprint database from repos       |
 | `reports/`            | Per-app CSV reports with matches      |
 | `summary-reports/`    | Condensed summary per app/library     |
+| `aggregate-reports/`  | aggregate summary per app/library     |
 
 ---
 

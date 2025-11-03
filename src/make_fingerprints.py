@@ -30,7 +30,7 @@ def to_smali_prefix(java_pkg: str) -> str:
         return ""
     return "L" + java_pkg.replace(".", "/") + "/"
 
-def read_text(path: Path, max_bytes: int = 2_000_000) -> str | None:
+def read_text(path: Path, max_bytes: int = 200_000) -> str | None:
     try:
         if path.stat().st_size > max_bytes:
             return None
@@ -49,6 +49,20 @@ def first_lines(path: Path, n: int = 80) -> list[str]:
     except Exception:
         pass
     return out
+
+def canonical_repo_key(host: str, repo_path: str) -> str:
+    return repo_path
+
+def load_manifest(manifest_csv: Path) -> list[dict]:
+    rows = []
+    with manifest_csv.open("r", encoding="utf-8", newline="") as f:
+        r = csv.DictReader(f)
+        for row in r:
+            # Only consider status ok/existing/dry_run
+            status = (row.get("status") or "").lower()
+            if status in ("ok","exists","dry_run"):
+                rows.append(row)
+    return rows
 
 def detect_java_kotlin_packages(repo_root: Path, max_files: int) -> list[tuple[str,str,str]]:
     """
@@ -72,26 +86,33 @@ def detect_java_kotlin_packages(repo_root: Path, max_files: int) -> list[tuple[s
             count += 1
     return results
 
-def detect_manifest_package(repo_root: Path) -> list[tuple[str,str,str]]:
+def detect_manifest_package(repo_root, max_files):
     out = []
+    count = 0
     for man in repo_root.rglob("AndroidManifest.xml"):
+        if max_files and count >= max_files:
+            return out
         txt = read_text(man, max_bytes=1_000_000)
-        if not txt: 
+        if not txt:
             continue
         m = MANIFEST_PKG_RE.search(txt)
         if m:
             pref = to_smali_prefix(m.group(1))
             if pref:
                 out.append((pref, "manifest_package", str(man)))
+        count += 1
     return out
 
-def detect_maven_group_artifact(repo_root: Path) -> list[tuple[str,str,str]]:
+def detect_maven_group_artifact(repo_root, max_files):
     """
     Read any pom.xml; yield groupId as smali prefix (maven_group_prefix)
     and artifactId-root as smali prefix (artifact_root) heuristically.
     """
     out = []
+    count = 0
     for pom in repo_root.rglob("pom.xml"):
+        if max_files and count >= max_files:
+            return out
         txt = read_text(pom, max_bytes=1_000_000)
         if not txt:
             continue
@@ -111,11 +132,15 @@ def detect_maven_group_artifact(repo_root: Path) -> list[tuple[str,str,str]]:
         if artifactId and re.match(r"^[a-zA-Z0-9_.-]+$", artifactId):
             art = artifactId.replace(".", "/")
             out.append((f"L{art}/", "maven_artifact_root", str(pom)))
+        count += 1
     return out
 
-def detect_gradle_group(repo_root: Path) -> list[tuple[str,str,str]]:
+def detect_gradle_group(repo_root, max_files):
     out = []
+    count = 0
     for gradle in list(repo_root.rglob("build.gradle")) + list(repo_root.rglob("build.gradle.kts")):
+        if max_files and count >= max_files:
+            return out
         lines = first_lines(gradle, 200)
         for ln in lines:
             m = GRADLE_GROUP_ASSIGN.match(ln) or GRADLE_GROUP_STR.match(ln)
@@ -124,22 +149,71 @@ def detect_gradle_group(repo_root: Path) -> list[tuple[str,str,str]]:
                 if gp:
                     out.append((gp, "gradle_group_prefix", str(gradle)))
                 break
+        count += 1
     return out
 
-def canonical_repo_key(host: str, repo_path: str) -> str:
-    # owner/repo for GitHub/Bitbucket; full path for GitLab (subgroups)
-    return repo_path
+def detect_js_global_assignments(repo_root, max_files):
+    """
+    Detect JavaScript library namespaces via global assignments.
+    Handles this.X =, window.X =, root.X = (where root = this), and define("X", ...).
+    Output tuples are (js_filename, "javascript_define", file_path), so the first element is
+    the JavaScript file name (for manifest-based matching), not a smali prefix.
+    """
+    out = []
+    JS_ALIAS_RE = re.compile(r'^\s*(?:var|let|const)?\s*(\w+)\s*=\s*this\s*;')
+    JS_GLOBAL_RE = re.compile(r'(?:(?:this|window|global|__alias__)\.([A-Z][\w$]+)|define\(\s*["\']([A-Z][\w$]+)["\'])')
 
-def load_manifest(manifest_csv: Path) -> list[dict]:
-    rows = []
-    with manifest_csv.open("r", encoding="utf-8", newline="") as f:
-        r = csv.DictReader(f)
-        for row in r:
-            # Only consider status ok/existing/dry_run
-            status = (row.get("status") or "").lower()
-            if status in ("ok","exists","dry_run"):
-                rows.append(row)
-    return rows
+    count = 0
+    for js in repo_root.rglob("*.js"):
+        if max_files and count >= max_files:
+            return out
+        alias_vars = set()
+        lines = first_lines(js, 120)
+        for ln in lines:
+            # Detect aliases to "this" (e.g., var root = this;)
+            m_alias = JS_ALIAS_RE.search(ln)
+            if m_alias:
+                alias_vars.add(m_alias.group(1))
+
+        # Build dynamic pattern with known aliases
+        if alias_vars:
+            aliases_pattern = "|".join(re.escape(a) for a in alias_vars)
+            pattern = (
+                rf'(?:(?:this|window|global|(?:{aliases_pattern}))\.([A-Z][\w$]+)'
+                rf'|define\(\s*["\']([A-Z][\w$]+)["\'])'
+            )
+            try:
+                dynamic_re = re.compile(pattern)
+            except re.error as e:
+                log(f"Regex compile error in JS alias pattern ({e}): {pattern}")
+                dynamic_re = JS_GLOBAL_RE
+        else:
+            dynamic_re = JS_GLOBAL_RE
+
+        for ln in lines:
+            m = dynamic_re.search(ln)
+            if m:
+                ns = m.group(1) or m.group(2)
+                if ns:
+                    full_path = js.resolve()
+                    rel_path_parts = full_path.parts
+
+                    try:
+                        idx = next(i for i, p in enumerate(rel_path_parts) if p.lower() in {"frameworks", "framework", "dist", "vendor", "vendors", "lib", "library", "libraries", "package", "packages"})
+                        rel_parts = rel_path_parts[idx + 1:]
+                    except StopIteration:
+                        try:
+                            idx = rel_path_parts.index(repo_root.name)
+                            rel_parts = rel_path_parts[idx + 1:]
+                        except ValueError:
+                            rel_parts = full_path.parts[-4:]
+
+                    refined_path = "/".join(rel_parts)
+                    out.append((refined_path, "javascript_define", str(js)))
+                    break
+        count += 1
+
+    return out
 
 def dedup(seq: list[tuple[str,str,str]]) -> list[tuple[str,str,str]]:
     seen = set()
@@ -163,10 +237,12 @@ def process_one_repo(row: dict, out_dir: Path, max_files: int) -> list[list[str]
     # Collect fingerprints
     fps = []
     fps += detect_java_kotlin_packages(local_path, max_files=max_files)
-    fps += detect_manifest_package(local_path)
-    fps += detect_maven_group_artifact(local_path)
-    fps += detect_gradle_group(local_path)
+    fps += detect_manifest_package(local_path, max_files=max_files)
+    fps += detect_maven_group_artifact(local_path, max_files=max_files)
+    fps += detect_gradle_group(local_path, max_files=max_files)
+    fps += detect_js_global_assignments(local_path, max_files=max_files)
 
+    log(f"{local_path}")
     fps = dedup(fps)
 
     # Convert to rows for CSV
@@ -226,28 +302,42 @@ def main():
         # Ensure local_path points inside repos-dir if manifest used a different base
         local_path = Path(row.get("local_path") or "")
         if not local_path.is_absolute():
-            local_path = Path(args.input_dir) / Path(row.get("host") or "") / Path(row.get("repo_path") or "")
+            host = (row.get("host") or "")
+            user_repo = Path(row.get("repo_path") or "")
+            user_part = user_repo.parts[0] if len(user_repo.parts) >= 1 else ""
+            repo_part = Path(*user_repo.parts[1:]) if len(user_repo.parts) > 1 else Path()
+
+            candidate_paths = [
+                Path(args.input_dir) / host / user_part / repo_part,
+                Path(args.input_dir) / host / user_part.lower() / repo_part,
+                Path(args.input_dir) / host / user_part.capitalize() / repo_part
+            ]
+            for cand in candidate_paths:
+                if cand.exists():
+                    local_path = cand
+                    break
+
             row = dict(row)
             row["local_path"] = str(local_path)
         return process_one_repo(row, out_path.parent, args.max_files)
 
-    i = 0
     written = 0
     if args.workers > 1:
         with ThreadPoolExecutor(max_workers=args.workers) as ex:
             futs = [ex.submit(work, r) for r in rows]
-            for fut in as_completed(futs):
-                rows_out = fut.result()
+            for i, fut in enumerate(as_completed(futs), 1):
+                rows_out = fut.result()  
                 if rows_out:
                     with out_path.open("a", encoding="utf-8", newline="") as f:
                         w = csv.writer(f)
-                        for r in rows_out:
-                            w.writerow(r)
+                        for r2 in rows_out:
+                            w.writerow(r2)
                             written += 1
-                i += 1
+                    # log(f"End Process: {i}: {rows_out[0][2]}")
                 if i % args.log_every == 0:
                     log(f"Processed repos: {i}/{len(rows)}  fingerprints so far: {written}")
     else:
+        i = 0
         for r in rows:
             rows_out = work(r)
             if rows_out:

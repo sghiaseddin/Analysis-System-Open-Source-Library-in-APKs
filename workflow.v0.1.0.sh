@@ -59,13 +59,14 @@ else
     echo "Skipping: Step 1"
 fi
 
-# Tag APKs using scraper requesting Google Play Store
-# Scan existing APK files and if find any custom apk added to the directory, then include it in the pipeline
+# Fetch metadata from https://androzoo.uni.lu/gp-metadata
+# Prompt Ollama with app description and tag the apps in desired categories
 # input: latest_playstore_per_pkg.csv
-# input: ./data/apks --> to check and include Custom apk files added from another source
+# output: metadata/[sha256].json --> app's metadata
 # output: tagged_apps.csv
-if step "Step 2: Tag APKs using scraper requesting Google Play Store"; then
-    python ./src/tag_apps_by_play_store_scraper.py --input-data ./database/latest_playstore_per_pkg.csv --input-dir ./data/apks --output-data ./database/tagged_apps.csv  --log-every 10 --research-categories $RESEARCH_CATEGORY $LIMIT_ARG || exit 1
+#todo --> get androzoo apikey from .env file
+if step "Step 2: Tag APKs with Ollama AI model"; then
+    python ./src/tag_apps_with_ollama.py --input-data ./database/latest_playstore_per_pkg.csv --output-data ./database/tagged_apps.csv --ollama-endpoint $OLLAMA_ENDPOINT --ollama-model $OLLAMA_MODEL --log-every 10 --output-dir ./data/metadata --apikey $ANDROZOO_API_KEY --research-categories $RESEARCH_CATEGORY $LIMIT_ARG || exit 1
 else
     echo "Skipping: Step 2"
 fi
@@ -74,14 +75,14 @@ fi
 # input: tagged_apps.csv
 # output: apks/[sha256].apk
 if step "Step 3: Download APKs"; then
-    python ./src/download_apks.py --apps-data ./database/tagged_apps.csv --output-dir ./data/apks --log-every 10 --research-categories $RESEARCH_CATEGORY --apikey $ANDROZOO_API_KEY $LIMIT_ARG || exit 1
+    python ./src/download_apks.py --input-data ./database/tagged_apps.csv --output-dir ./data/apks --threshold 0.90 --log-every 10 --research-categories $RESEARCH_CATEGORY --apikey $ANDROZOO_API_KEY $LIMIT_ARG || exit 1
 else
     echo "Skipping: Step 3"
 fi
 
 # Decode apk files using https://apktool.org/
-# input: apks/[pkg_name].apk
-# output: decoded/[pkg_name] --> directory
+# input: apks/[sha256].apk
+# output: decoded/[sha256] --> directory
 if step "Step 4: Decode APKs"; then
     python ./src/decode_apks.py --input-dir ./data/apks --output-dir ./data/decoded --log-every 10 $LIMIT_ARG || exit 1
 else
@@ -89,16 +90,16 @@ else
 fi
 
 # Find every mentioned license in decoded files
-# input: decoded/[pkg_name]
-# output: license_lists/[pkg_name].csv --> lists of licenses in each app
+# input: decoded/[sha256]
+# output: license_lists/[sha256].csv --> lists of licenses in each app
 if step "Step 5: Find licenses"; then
-    python ./src/find_open_source_library.py --input-dir ./data/decoded --output-dir ./database/license_lists --log-every 10 $LIMIT_ARG --force || exit 1
+    python ./src/find_open_source_library.py --input-dir ./data/decoded --output-dir ./database/license_lists --log-every 10 $LIMIT_ARG || exit 1
 else
     echo "Skipping: Step 5"
 fi
 
 # Clone libraries using GitHub credentials #todo avaialable in the .env file
-# input: license_lists/[pkg_name].csv
+# input: license_lists/[sha256].csv
 # output: repos_manifest.csv
 # output: repos --> directory
 if step "Step 6: Clone Git Repos"; then
@@ -112,7 +113,7 @@ fi
 # input: repos
 # output: fingerprints.csv
 if step "Step 7: Make library fingerprints"; then
-    python ./src/make_fingerprints.py --input-data ./database/repos_manifest.csv --input-dir ./data/repos --output-data ./database/fingerprints.csv --workers 6 --max-files 8000 --log-every 10 --force  || exit 1
+    python ./src/make_fingerprints.py --input-data ./database/repos_manifest.csv --input-dir ./data/repos --output-data ./database/fingerprints.csv --workers 6 --max-files 8000 --force || exit 1
 else
     echo "Skipping: Step 7"
 fi
@@ -120,17 +121,17 @@ fi
 # Match fingerprints in the decoded apk files and report if find any
 # input: fingerprints.csv
 # input: decoded
-# output: classes_index
-# output: reports/[pkg_name].csv
+# output: classes_evidence_list
+# output: reports/[sha256].csv
 if step "Step 8: Match fingerprints in decoded APKs"; then
-    python ./src/match_fingerprints_in_apks.py --input-dir ./data/decoded --input-data ./database/fingerprints.csv  --output-dir ./data/classes_index --output-dir2 ./reports --workers 6 --log-every 1 || exit 1
+    python ./src/match_fingerprints_in_apks.py --input-dir ./data/decoded --input-data ./database/fingerprints.csv  --output-dir ./data/classes_evidence_list --output-dir2 ./reports --workers 6 --log-every 10 || exit 1
 else
     echo "Skipping: Step 8"
 fi
 
 # Aggregate reports and make a summary report for each app
 # input: reports --> directory
-# output: summary-reports/[pkg_name].csv
+# output: summary-reports/[sha256].csv
 if step "Step 9: Summarize report results"; then
     python ./src/summarize_reports.py --input-dir ./reports --output-dir ./summary-reports --workers 6 --log-every 10 || exit 1
 else
@@ -139,19 +140,9 @@ fi
 
 # Check and search decoded apk for any cited license url
 # input: summary-reports --> directory
-# output: summary-reports/[pkg_name].csv
+# output: summary-reports/[sha256].csv
 if step "Step 10: Check license citation"; then
     python ./src/check_license_citation.py --input-dir ./summary-reports --input-dir2 ./data/decoded --workers 6 --log-every 10 || exit 1
 else
     echo "Skipping: Step 10"
-fi
-
-# Aggregate summary reports with license list
-# input: summary-reports --> directory
-# input: license_lists --> directory
-# output: aggregate-reports/[pkg_name].csv
-if step "Step 11: Aggregate summary reports and license lists"; then
-    python ./src/aggregate_reports.py --input-dir ./summary-reports --input-dir2 ./database/license_lists --output-dir ./aggregate-reports --workers 6 --log-every 10 || exit 1
-else
-    echo "Skipping: Step 11"
 fi

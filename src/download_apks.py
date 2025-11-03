@@ -32,47 +32,20 @@ def parse_categories(cell: Any) -> Optional[Dict[str, float]]:
     except Exception:
         return None
 
-def row_is_eligible(row: pd.Series, threshold: float) -> bool:
-    """Return True if row should be downloaded.
-    If RESEARCH_CATEGORIES is non-empty, require that the app's assigned category
-    matches any of the research tokens (case-insensitive substring match).
-    Otherwise, fall back to old threshold logic (use parse_categories to get score dict).
+def is_category_research(row) -> bool:
+    """
+    Return True if row should be downloaded.
+    We no longer use threshold scoring or JSON category cells.
+    We only check category string directly when RESEARCH_CATEGORIES is non-empty.
     """
     # If research categories specified, prefer exact/category-string matching
     if RESEARCH_CATEGORIES:
-        cell = row.get("categories")
-        if cell is None:
+        category_value = str(row.get("category", "") or "").strip().lower()
+        if not category_value:
             return False
-        # If it's a plain string (e.g., 'FINANCE'), use it directly
-        if isinstance(cell, str):
-            cat_str = cell.strip().lower()
-        else:
-            # Try to parse JSON-like cell (old format)
-            parsed = parse_categories(cell)
-            # parsed could be a dict of scores or a dict with 'category' key
-            if isinstance(parsed, dict):
-                # If it contains a single string value under 'category', use it
-                cat_val = parsed.get("category") or parsed.get("Category")
-                if isinstance(cat_val, str):
-                    cat_str = cat_val.strip().lower()
-                else:
-                    # Not a string category; fail-safe -> do not select
-                    return False
-            else:
-                return False
-        # Check any research token is substring of cat_str
-        for token in RESEARCH_CATEGORIES:
-            if token in cat_str:
-                return True
-        return False
 
-    # Fallback: old behavior — JSON scores and threshold
-    cats = parse_categories(row.get("categories"))
-    if not cats:
-        return False
-    try:
-        return max(cats.values()) >= threshold
-    except Exception:
+        if category_value in RESEARCH_CATEGORIES:
+            return True
         return False
 
 def safe_format(template: str, **kwargs) -> str:
@@ -83,7 +56,7 @@ def safe_format(template: str, **kwargs) -> str:
     return template.format_map(SafeDict(**kwargs))
 
 def download_apk(sha256: str, apikey: str, out_path: Path,
-                 retries: int = 5, backoff_base: float = 0.5, verify_sha256: bool = False) -> bool:
+                 retries: int = 2, backoff_base: float = 0.5, verify_sha256: bool = False) -> bool:
     """Download a single APK by sha256 to out_path. Returns True if file is present/valid."""
     # Skip if exists
     if out_path.exists():
@@ -138,15 +111,13 @@ def download_apk(sha256: str, apikey: str, out_path: Path,
 
 def main():
     ap = argparse.ArgumentParser(description="Download APKs from AndroZoo by sha256 based on tagged_apps.csv.")
-    ap.add_argument("--input-data", required=True, help="CSV with categories JSON column (e.g., tagged_apps.csv)")
+    ap.add_argument("--apps-data", required=True, help="Apps data in CSV format with category, origin, and other scraped details (e.g., tagged_apps.csv)")
     ap.add_argument("--output-dir", default="apks", help="Directory to store APKs (default: ./apks)")
     ap.add_argument("--apikey", default=os.getenv("ANDROZOO_APIKEY") or os.getenv("APIKEY"),
                     help="AndroZoo API key (or set ANDROZOO_APIKEY/APIKEY env var)")
     ap.add_argument("--limit", type=int, default=100, help="Max rows/APKs to process (default 100)")
-    ap.add_argument("--threshold", type=float, default=DEFAULT_THRESHOLD,
-                    help=f"Min category score to qualify (default {DEFAULT_THRESHOLD})")
-    ap.add_argument("--filename-template", default="{sha256}.apk",
-                    help="Output filename template. Fields: {sha256},{pkg_name},{vercode} (default: {sha256}.apk)")
+    ap.add_argument("--filename-template", default="{pkg_name}.apk",
+                    help="Output filename template. Fields: {sha256},{pkg_name},{vercode} (default: {pkg_name}.apk)")
     ap.add_argument("--force", action="store_true", help="Overwrite existing files")
     ap.add_argument("--verify-sha256", action="store_true", help="Hash downloaded file and verify sha256")
     ap.add_argument("--log-every", type=int, default=DEFAULT_LOG_EVERY, help="Log every N downloads (default 20)")
@@ -171,7 +142,7 @@ def main():
     exists = 0
 
     # We need at least sha256 + categories; pkg_name/vercode optional for filename template
-    reader = pd.read_csv(args.input_data, chunksize=100_000, low_memory=True)
+    reader = pd.read_csv(args.apps_data, chunksize=100_000, low_memory=True)
 
     try:
         for chunk in reader:
@@ -185,8 +156,19 @@ def main():
 
                 total_seen += 1
 
-                # Category eligibility check
-                if not row_is_eligible(row, args.threshold):
+                origin = str(row.get("origin", "") or "").strip()
+                # Conditional download logic based on origin and category
+                if origin == "AndroZoo":
+                    # Only download if category matches research categories
+                    if not is_category_research(row):
+                        # log(f"{row.get('pkg_name')}: {is_category_research(row)} RESEARCH_CATEGORIES: {RESEARCH_CATEGORIES}")
+                        skipped += 1
+                        continue
+                elif origin == "Custom":
+                    # Always download regardless of category
+                    pass
+                else:
+                    # Skip all other origins
                     skipped += 1
                     continue
 
@@ -201,7 +183,7 @@ def main():
                 filename = safe_format(args.filename_template,
                                        sha256=sha256, pkg_name=pkg_name, vercode=vercode)
                 if not filename:
-                    filename = f"{sha256}.apk"
+                    filename = f"{pkg_name}.apk"
 
                 out_path = outdir / filename
 

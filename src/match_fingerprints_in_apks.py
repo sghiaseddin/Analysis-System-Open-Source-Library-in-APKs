@@ -2,17 +2,18 @@
 import argparse
 import csv
 import os
-import re
 import sys
 import json
+import re
 from pathlib import Path
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import bisect
 
-CLASS_RE = re.compile(r'^\s*\.class\s+[^\s]+\s+([^\s]+)')  # captures e.g. Lcom/foo/Bar;
+CLASS_RE = re.compile(r'^\s*\.class\b(?:\s+\w+)*\s+(L[^\s;]+;)')  # captures e.g. Lcom/foo/Bar;
 
 def log(msg: str, *, flush=True):
-    print(f"[{datetime.now().strftime("%H:%M:%S")}] {msg}", flush=flush)
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}", flush=flush)
 
 # ---------- Fingerprints ----------
 def load_fingerprints(fp_csv: Path):
@@ -27,7 +28,8 @@ def load_fingerprints(fp_csv: Path):
         for row in r:
             pref = (row.get("smali_prefix") or "").strip()
             if not pref or not pref.startswith("L") or not pref.endswith("/"):
-                continue  # only accept normalized smali-style prefixes
+                pass
+                #continue  # only accept normalized smali-style prefixes
             key = pref
             entry = (
                 row.get("repo_host",""),
@@ -69,19 +71,34 @@ def index_classes_for_app(app_dir: Path):
 
 def load_or_build_class_index(app_dir: Path, index_dir: Path, force: bool = False):
     """
-    Uses classes_index/<sha256>.json if present (and not --force). Otherwise builds and writes it.
+    Uses classes_index/<pkg_name>.json if present (and not --force). Otherwise builds and writes it.
     """
-    sha = app_dir.name
+    pkg_name = app_dir.name
     index_dir.mkdir(parents=True, exist_ok=True)
-    out_json = index_dir / f"{sha}.json"
+    out_json = index_dir / f"{pkg_name}.json"
     if out_json.exists() and not force:
         try:
             return json.loads(out_json.read_text(encoding="utf-8"))
         except Exception:
             pass
-    classes = index_classes_for_app(app_dir)
+    log(f"Start indxing classes of {pkg_name}")
+    classes = sorted(index_classes_for_app(app_dir), key=lambda x: x.get("class", ""))
     out_json.write_text(json.dumps(classes, ensure_ascii=False), encoding="utf-8")
     return classes
+
+def find_first_matching_class(classes, prefix):
+    """
+    Binary search to find the index of the first class whose descriptor starts with prefix.
+    """
+    class_list = [c.get("class", "") for c in classes]
+    index = bisect.bisect_left(class_list, prefix)
+    while index < len(classes):
+        descriptor = class_list[index]
+        if descriptor.startswith(prefix):
+            return index
+        index += 1
+    return -1
+
 
 # ---------- Matching ----------
 def all_prefixes_for_class(class_desc: str):
@@ -111,22 +128,26 @@ def all_prefixes_for_class(class_desc: str):
     return prefixes
 
 def match_app(prefix_map, app_dir: Path, classes_index_dir: Path, out_dir: Path, force: bool = False):
-    sha = app_dir.name
+    pkg_name = app_dir.name
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_csv = out_dir / f"{sha}.csv"
+    out_csv = out_dir / f"{pkg_name}.csv"
     if out_csv.exists() and not force:
         return "exists", 0
 
     classes = load_or_build_class_index(app_dir, classes_index_dir, force=False)
+    classes.sort(key=lambda c: c.get("class", ""))
+    
     if not classes:
         out_csv.write_text("")  # empty marker
         return "no_classes", 0
+    
+    js_files = list(app_dir.rglob("*.js"))
 
     # Prepare write
     with out_csv.open("w", encoding="utf-8", newline="") as f:
         w = csv.writer(f)
         w.writerow([
-            "app_sha256", "repo_host", "repo_path", "repo_url",
+            "app_pkg_name", "repo_host", "repo_path", "repo_url",
             "libarary_key", "library_name",
             "smali_prefix", "fingerprint_type",
             "class", "class_file"
@@ -134,26 +155,62 @@ def match_app(prefix_map, app_dir: Path, classes_index_dir: Path, out_dir: Path,
 
         emitted = set()
         count = 0
-        for c in classes:
-            clazz = c["class"]  # e.g., Lcom/foo/bar/Baz;
-            cpath = c["path"]
-            for pref in all_prefixes_for_class(clazz):
-                if pref in prefix_map:
-                    # for each fingerprint that matches this prefix, emit
-                    for (repo_host, repo_path, repo_url, libkey, libname, smali_prefix, fptype, repo_fp_path) in prefix_map[pref]:
-                        key = (clazz, smali_prefix, repo_host, repo_path)
+        for known_prefix in prefix_map:
+            # JavaScript-style fingerprint: known_prefix contains a relative path from the repo
+            if not known_prefix.startswith("L"):
+                # known_prefix is expected to be a relative path like "Frameworks/Laravel/Version_8_x/resources/js/app.js"
+                # We will match only by ONE-LEVEL parent directory + filename to avoid false positives.
+                kp_path = Path(known_prefix)
+                kp_name = kp_path.name
+                kp_parent = kp_path.parent.name if (kp_path.parent and str(kp_path.parent) != '.') else None
+
+                for js_file in js_files:
+                    # filename must match
+                    if js_file.name != kp_name:
+                        continue
+
+                    # if known_prefix carries a parent, require one-level parent match (case-insensitive)
+                    if kp_parent:
+                        if js_file.parent.name.lower() != kp_parent.lower():
+                            continue
+
+                    # build a short relative fingerprint path to write (one-level parent + filename)
+                    rel_fp = (Path(js_file.parent.name) / js_file.name).as_posix()
+
+                    for (repo_host, repo_path, repo_url, libkey, libname, smali_prefix, fptype, repo_fp_path) in prefix_map[known_prefix]:
+                        key = (rel_fp, smali_prefix, repo_host, repo_path)
                         if key in emitted:
                             continue
-                        w.writerow([sha, repo_host, repo_path, repo_url, libkey, libname, smali_prefix, fptype, clazz, cpath])
+                        w.writerow([pkg_name, repo_host, repo_path, repo_url, libkey, libname, smali_prefix, fptype, rel_fp, str(js_file)])
                         emitted.add(key)
                         count += 1
+                continue  # skip to next known_prefix
+
+            idx = find_first_matching_class(classes, known_prefix)
+            if idx == -1:
+                continue
+
+            for i in range(idx, len(classes)):
+                c = classes[i]
+                descriptor = c.get("class", "")
+                cpath = c.get("path", "")
+                if not descriptor.startswith(known_prefix):
+                    break
+
+                for (repo_host, repo_path, repo_url, libkey, libname, smali_prefix, fptype, repo_fp_path) in prefix_map[known_prefix]:
+                    key = (descriptor, smali_prefix, repo_host, repo_path)
+                    if key in emitted:
+                        continue
+                    w.writerow([pkg_name, repo_host, repo_path, repo_url, libkey, libname, smali_prefix, fptype, descriptor, cpath])
+                    emitted.add(key)
+                    count += 1
 
     return "ok", count
 
 # ---------- Main ----------
 def main():
     ap = argparse.ArgumentParser(description="Match fingerprints.csv against decoded APKs and write per-app reports.")
-    ap.add_argument("--input-dir", default="decoded", help="decoded/<sha256> directories")
+    ap.add_argument("--input-dir", default="decoded", help="decoded/<pkg_name> directories")
     ap.add_argument("--input-data", default="fingerprints.csv", help="fingerprints.csv generated from repos")
     ap.add_argument("--output-dir", default="classes_index", help="where to cache/read per-app class indices")
     ap.add_argument("--output-dir2", default="reports", help="output folder for per-app report CSVs")
@@ -191,6 +248,7 @@ def main():
     matched_rows = 0
 
     def work(app_dir):
+        log(f"Start matching fingerprints with {app_dir.name}")
         status, n = match_app(prefix_map, app_dir, class_dir, report_dir, force=args.force)
         return (app_dir.name, status, n)
 
@@ -199,16 +257,16 @@ def main():
         with ThreadPoolExecutor(max_workers=args.workers) as ex:
             futs = [ex.submit(work, a) for a in apps]
             for i, fut in enumerate(as_completed(futs), 1):
-                sha, status, n = fut.result()
-                results.append((sha, status, n))
+                pkg_name, status, n = fut.result()
+                results.append((pkg_name, status, n))
                 processed += 1
                 matched_rows += n
                 if processed % args.log_every == 0:
                     log(f"Processed {processed}/{len(apps)} | matches so far: {matched_rows}")
     else:
         for i, a in enumerate(apps, 1):
-            sha, status, n = work(a)
-            results.append((sha, status, n))
+            pkg_name, status, n = work(a)
+            results.append((pkg_name, status, n))
             processed += 1
             matched_rows += n
             if processed % args.log_every == 0:
