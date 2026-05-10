@@ -1,0 +1,52 @@
+[0] Config.pm:328> INFO - This is Biber 2.21 running in TOOL mode
+[0] Config.pm:331> INFO - Logfile is 'references.bib.blg'
+[28] biber-darwin:342> INFO - === Thu May  7, 2026, 08:08:42
+[40] Biber.pm:4674> INFO - Looking for bibtex file 'references.bib'
+[43] bibtex.pm:1713> INFO - LaTeX decoding ...
+[103] bibtex.pm:1519> INFO - Found BibTeX data source 'references.bib'
+[349] Biber.pm:1709> INFO - Datamodel validation starting
+[359] Biber.pm:1759> INFO - Datamodel validation complete
+[365] UCollate.pm:68> INFO - Overriding locale 'en_US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[365] UCollate.pm:68> INFO - Overriding locale 'en_US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[365] Biber.pm:4307> INFO - Sorting list 'tool/global//global/global/global' of type 'entry' with template 'tool' and locale 'en_US'
+[365] Biber.pm:4313> INFO - No sort tailoring available for locale 'en_US'
+[394] bibtex.pm:440> INFO - Writing 'references_bibertool.bib' with encoding 'UTF-8'
+[398] bibtex.pm:481> INFO - Output to references_bibertool.bib
+[398] Biber.pm:132> WARN - Datamodel: article entry 'ajilaEmpiricalStudyEffects2007' (references.bib): Field 'copyright' invalid in data model - ignoring
+[398] Biber.pm:132> WARN - Datamodel: inproceedings entry 'wermkeAlwaysContributeBack2023' (references.bib): Field 'copyright' invalid in data model - ignoring
+[398] Biber.pm:132> WARN - Datamodel: report entry 'cordeySoftwareSupplyChain2023' (references.bib): Field 'collaborator' invalid in data model - ignoring
+[398] Biber.pm:132> WARN - Datamodel: article entry 'lernerSimpleEconomicsOpen2002' (references.bib): Field 'copyright' invalid in data model - ignoring
+[398] Biber.pm:132> WARN - Datamodel: misc entry 'aguilaSoftwareEngineeringTimeline2020' (references.bib): Invalid field 'number' for entrytype 'misc'
+[398] Biber.pm:132> WARN - Datamodel: misc entry 'aguilaSoftwareEngineeringTimeline2020' (references.bib): Invalid field 'publisher' for entrytype 'misc'
+[398] Biber.pm:132> WARN - Datamodel: article entry 'dahiyaAndroidMalwareAnalysis2025' (references.bib): Invalid ISSN in value of field 'issn'
+[398] Biber.pm:132> WARN - Datamodel: misc entry 'DROWNAttack' (references.bib): Missing mandatory field - one of 'date, year' must be defined
+[398] Biber.pm:132> WARN - Datamodel: article entry 'fitzgeraldTransformationOpenSource2006' (references.bib): Invalid ISSN in value of field 'issn'
+[398] Biber.pm:132> WARN - Datamodel: misc entry 'guRevisitingThirdPartyLibrary2025' (references.bib): Invalid field 'number' for entrytype 'misc'
+[398] Biber.pm:132> WARN - Datamodel: misc entry 'guRevisitingThirdPartyLibrary2025' (references.bib): Invalid field 'publisher' for entrytype 'misc'
+[398] Biber.pm:132> WARN - Datamodel: inproceedings entry 'kumarComprehensiveStudyImpact2024' (references.bib): Invalid field 'issn' for entrytype 'inproceedings'
+[399] Biber.pm:132> WARN - Datamodel: inproceedings entry 'ladisaSoKTaxonomyAttacks2023' (references.bib): Invalid field 'issn' for entrytype 'inproceedings'
+[399] Biber.pm:132> WARN - Datamodel: article entry 'lernerSimpleEconomicsOpen2002' (references.bib): Invalid ISSN in value of field 'issn'
+[399] Biber.pm:132> WARN - Datamodel: article entry 'liSystematicLiteratureReview2025' (references.bib): Invalid ISSN in value of field 'issn'
+[399] Biber.pm:132> WARN - Datamodel: misc entry 'luOpenSourceSoftware2025' (references.bib): Invalid field 'number' for entrytype 'misc'
+[399] Biber.pm:132> WARN - Datamodel: misc entry 'luOpenSourceSoftware2025' (references.bib): Invalid field 'publisher' for entrytype 'misc'
+[399] Biber.pm:132> WARN - Datamodel: article entry 'ojhaEmergenceOrganizationalField2014' (references.bib): Invalid ISSN in value of field 'issn'
+[399] Biber.pm:132> WARN - Datamodel: report entry 'OpenSourceSecurity' (references.bib): Missing mandatory field - one of 'date, year' must be defined
+[399] Biber.pm:132> WARN - Datamodel: report entry 'OpenSourceSecurity' (references.bib): Missing mandatory field 'author'
+[399] Biber.pm:132> WARN - Datamodel: report entry 'OpenSourceSecurity' (references.bib): Missing mandatory field 'institution'
+[399] Biber.pm:132> WARN - Datamodel: article entry 'panEmpiricalStudyRobustness2026' (references.bib): Missing mandatory field 'journaltitle'
+[399] Biber.pm:132> WARN - Datamodel: inproceedings entry 'panPayYourAttention2025' (references.bib): Invalid field 'issn' for entrytype 'inproceedings'
+[399] Biber.pm:132> WARN - Datamodel: thesis entry 'plateSecurityRisksOpen2024' (references.bib): Invalid field 'number' for entrytype 'thesis'
+[399] Biber.pm:132> WARN - Datamodel: article entry 'pranaOutSightOut2021' (references.bib): Invalid ISSN in value of field 'issn'
+[399] Biber.pm:132> WARN - Datamodel: article entry 'reichertSoftwareSupplyChain2024' (references.bib): Invalid field 'publisher' for entrytype 'article'
+[399] Biber.pm:132> WARN - Datamodel: misc entry 'shandlerBreakingTrustShades2020' (references.bib): Invalid field 'journaltitle' for entrytype 'misc'
+[399] Biber.pm:132> WARN - Datamodel: misc entry 'shaoExploitWildDrupalgeddon22018' (references.bib): Invalid field 'journaltitle' for entrytype 'misc'
+[399] Biber.pm:132> WARN - Datamodel: article entry 'cusumanoSoftwareFactoryHistorical1989' (references.bib): Invalid field 'publisher' for entrytype 'article'
+[399] Biber.pm:132> WARN - Datamodel: online entry 'TimelineSSCAttacks' (references.bib): Missing mandatory field - one of 'date, year' must be defined
+[399] Biber.pm:132> WARN - Datamodel: inproceedings entry 'wangEmpiricalStudyUsages2020' (references.bib): Invalid field 'issn' for entrytype 'inproceedings'
+[399] Biber.pm:132> WARN - Datamodel: article entry 'weberPoliticalEconomyOpen2000' (references.bib): Missing mandatory field 'journaltitle'
+[399] Biber.pm:132> WARN - Datamodel: inproceedings entry 'wermkeCommittedTrustQualitative2022' (references.bib): Invalid field 'issn' for entrytype 'inproceedings'
+[399] Biber.pm:132> WARN - Datamodel: inproceedings entry 'wuUnderstandingThreatsUpstream2023' (references.bib): Invalid field 'issn' for entrytype 'inproceedings'
+[399] Biber.pm:132> WARN - Datamodel: article entry 'yooDependencyNetworkStructure2025' (references.bib): Invalid field 'publisher' for entrytype 'article'
+[399] Biber.pm:132> WARN - Datamodel: misc entry 'zengSurveyThirdPartyLibrary2024' (references.bib): Invalid field 'number' for entrytype 'misc'
+[399] Biber.pm:132> WARN - Datamodel: misc entry 'zengSurveyThirdPartyLibrary2024' (references.bib): Invalid field 'publisher' for entrytype 'misc'
+[399] Biber.pm:134> INFO - WARNINGS: 37
