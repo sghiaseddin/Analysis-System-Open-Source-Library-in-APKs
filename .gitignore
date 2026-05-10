@@ -26,6 +26,8 @@ push-to-github.sh
 /reports/
 /summary-reports/
 /aggregate-reports/
+/analysis_datasets/
+/analysis_outputs/
 
 # IDE/editor settings
 .vscode/

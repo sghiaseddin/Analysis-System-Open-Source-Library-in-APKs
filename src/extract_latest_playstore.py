@@ -13,6 +13,8 @@ def parse_args():
     p.add_argument("--output-data", required=True, help="Path to the output CSV")
     p.add_argument("--chunksize", type=int, default=300_000, help="Rows per chunk (default: 300k)")
     p.add_argument("--log-every", type=int, default=1_000_000, help="Log progress every N input rows")
+    p.add_argument("--limit", type=int, default=None, help="Stop after finding this many APKs in the selected research categories")
+    p.add_argument("--research-categories", default="", help="Comma-separated category names to count toward --limit")
     return p.parse_args()
 
 def main():
@@ -22,15 +24,27 @@ def main():
         print(f"ERROR: Input not found: {args.input_data}", file=sys.stderr)
         sys.exit(1)
 
+    total_rows = 0
+    kept_rows = 0
+    matched_research_category_apks = 0
+
+    research_categories = {
+        category.strip()
+        for category in args.research_categories.split(",")
+        if category.strip()
+    }
+
+    category_column = next(
+        (column for column in ("category", "categories", "app_category", "app_categories") if column in []),
+        None
+    )
+
     # Dictionary holding the best (latest 'added') row per pkg_name.
     # Map: pkg_name -> (added_ts, row_as_dict)
     best_rows = {}
 
-    total_rows = 0
-    kept_rows = 0
-
     # If you want to limit columns for memory savings, define them here; otherwise None reads all.
-    # Example (uncomment to use): 
+    # Example (uncomment to use):  
     # usecols = ["sha256","sha1","md5","dex_date","apk_size","pkg_name","vercode",
     #            "vt_detection","vt_scan_date","dex_size","added","markets"]
     usecols = None
@@ -43,6 +57,10 @@ def main():
         low_memory=True
     )
 
+    if args.limit is not None and args.limit <= 0:
+        print(f"ERROR: --limit must be a positive integer, got: {args.limit}", file=sys.stderr)
+        sys.exit(1)
+
     start_time = datetime.now()
     print(f"[{start_time:%Y-%m-%d %H:%M:%S}] Start processing...", flush=True)
 
@@ -50,15 +68,51 @@ def main():
         rows_in_chunk = len(chunk)
         total_rows += rows_in_chunk
 
+        if research_categories and category_column is None:
+            category_column = next(
+                (column for column in ("category", "categories", "app_category", "app_categories") if column in chunk.columns),
+                None
+            )
+            if category_column is None:
+                print(
+                    "ERROR: --research-categories was provided, but no category column was found. "
+                    "Expected one of: category, categories, app_category, app_categories.",
+                    file=sys.stderr
+                )
+                sys.exit(1)
+
         # Filter to play.google.com first to reduce work
         # markets could be a list or a string; we use 'contains'
         play_mask = chunk["markets"].astype(str).str.contains("play.google.com", na=False)
         filtered = chunk.loc[play_mask].copy()
 
+        should_stop_after_chunk = False
+        if args.limit is not None and research_categories:
+            category_mask = filtered[category_column].astype(str).apply(
+                lambda value: any(
+                    category in {part.strip() for part in value.split(",") if part.strip()}
+                    for category in research_categories
+                )
+            )
+            matching_count = int(category_mask.sum())
+
+            if matching_count:
+                remaining = args.limit - matched_research_category_apks
+                if matching_count >= remaining:
+                    matching_indexes_to_keep = set(category_mask[category_mask].index[:remaining])
+                    filtered = filtered.loc[(~category_mask) | filtered.index.isin(matching_indexes_to_keep)].copy()
+                    matched_research_category_apks = args.limit
+                    should_stop_after_chunk = True
+                else:
+                    matched_research_category_apks += matching_count
+
         if filtered.empty:
             if total_rows % args.log_every < rows_in_chunk:
                 now = datetime.now()
-                print(f"[{now:%H:%M:%S}] Processed {total_rows:,} rows | kept {kept_rows:,} so far | unique packages {len(best_rows):,}", flush=True)
+                print(f"[{now:%H:%M:%S}] Processed {total_rows:,} rows | kept {kept_rows:,} so far | unique packages {len(best_rows):,} | research-category APKs {matched_research_category_apks:,}", flush=True)
+            if should_stop_after_chunk:
+                print(f"Reached limit of {args.limit:,} APKs in research categories. Stopping input loop.", flush=True)
+                break
             continue
 
         # Parse 'added' into datetime (coerce invalid to NaT and drop them)
@@ -68,7 +122,10 @@ def main():
         if filtered.empty:
             if total_rows % args.log_every < rows_in_chunk:
                 now = datetime.now()
-                print(f"[{now:%H:%M:%S}] Processed {total_rows:,} rows | kept {kept_rows:,} so far | unique packages {len(best_rows):,}", flush=True)
+                print(f"[{now:%H:%M:%S}] Processed {total_rows:,} rows | kept {kept_rows:,} so far | unique packages {len(best_rows):,} | research-category APKs {matched_research_category_apks:,}", flush=True)
+            if should_stop_after_chunk:
+                print(f"Reached limit of {args.limit:,} APKs in research categories. Stopping input loop.", flush=True)
+                break
             continue
 
         # Within this chunk, pick the latest 'added' per pkg_name
@@ -90,7 +147,11 @@ def main():
         # Periodic logging
         if total_rows % args.log_every < rows_in_chunk:
             now = datetime.now()
-            print(f"[{now:%H:%M:%S}] Processed {total_rows:,} rows | kept {kept_rows:,} (updates) | unique packages {len(best_rows):,}", flush=True)
+            print(f"[{now:%H:%M:%S}] Processed {total_rows:,} rows | kept {kept_rows:,} (updates) | unique packages {len(best_rows):,} | research-category APKs {matched_research_category_apks:,}", flush=True)
+
+        if should_stop_after_chunk:
+            print(f"Reached limit of {args.limit:,} APKs in research categories. Stopping input loop.", flush=True)
+            break
 
     # Build final DataFrame from dict values and write once
     if best_rows:

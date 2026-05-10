@@ -52,7 +52,7 @@ function step() {
 
 # Filter the list of all available APK files by latest version and marketplace (only Google Play)
 # input: latest_with-added-date.csv from https://androzoo.uni.lu/api_doc
-# output: latest_playstore_per_pkg.csv
+# output: latest_playstore_per_pkg.csv 
 if step "Step 1: Filter the list of APKs"; then
     python ./src/extract_latest_playstore.py --input-data ./database/latest_with-added-date.csv --output-data ./database/latest_playstore_per_pkg.csv   --chunksize 300000 --log-every 100000  || exit 1
 else
@@ -65,7 +65,7 @@ fi
 # input: ./data/apks --> to check and include Custom apk files added from another source
 # output: tagged_apps.csv
 if step "Step 2: Tag APKs using scraper requesting Google Play Store"; then
-    python ./src/tag_apps_by_play_store_scraper.py --input-data ./database/latest_playstore_per_pkg.csv --input-dir ./data/apks --output-data ./database/tagged_apps.csv  --log-every 10 --research-categories $RESEARCH_CATEGORY $LIMIT_ARG || exit 1
+    python ./src/tag_apps_by_play_store_scraper.py --input-data ./database/latest_playstore_per_pkg.csv --input-dir ./data/apks --output-data ./database/tagged_apps.csv --excluded-apps $EXCLUDED_APS  --log-every 10 --research-categories $RESEARCH_CATEGORY $LIMIT_ARG || exit 1
 else
     echo "Skipping: Step 2"
 fi
@@ -141,7 +141,7 @@ fi
 # input: summary-reports --> directory
 # output: summary-reports/[pkg_name].csv
 if step "Step 10: Check license citation"; then
-    python ./src/check_license_citation.py --input-dir ./summary-reports --input-dir2 ./data/decoded --workers 6 --log-every 10 || exit 1
+    python ./src/check_license_citation.py --input-dir ./summary-reports --input-dir2 ./data/decoded --excluded-apps $EXCLUDED_APS --workers 6 --log-every 10 || exit 1
 else
     echo "Skipping: Step 10"
 fi
@@ -154,4 +154,13 @@ if step "Step 11: Aggregate summary reports and license lists"; then
     python ./src/aggregate_reports.py --input-dir ./summary-reports --input-dir2 ./database/license_lists --output-dir ./aggregate-reports --workers 6 --log-every 10 || exit 1
 else
     echo "Skipping: Step 11"
+fi
+
+# Merge aggregate reports into one analysis dataset
+# input: aggregate-reports --> directory
+# output: analysis_datasets/dataset_$LIMIT_ARG.csv
+if step "Step 12: Create analysis dataset"; then
+    python ./src/create_analysis_dataset.py --input-dir ./aggregate-reports --output-dir ./analysis_datasets "$LIMIT_ARG" || exit 1
+else
+    echo "Skipping: Step 12"
 fi

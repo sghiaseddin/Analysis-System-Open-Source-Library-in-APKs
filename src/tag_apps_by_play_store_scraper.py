@@ -108,6 +108,7 @@ def main():
     ap.add_argument("--input-data", required=True)
     ap.add_argument("--output-data", required=True)
     ap.add_argument("--log-every", type=int, default=10)
+    ap.add_argument("--excluded-apps", required=False, help="Comma-separated list of apps")
     ap.add_argument("--research-categories", required=True, help="Comma-separated list of categories")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--input-dir", required=True, help="Directory to scan for additional custom APKs")
@@ -116,6 +117,11 @@ def main():
     input_file = Path(args.input_data)
     output_file = Path(args.output_data)
     desired_categories = set(c.strip().upper() for c in args.research_categories.split(","))
+    excluded_apps = set(
+        app.strip()
+        for app in (args.excluded_apps or "").split(",")
+        if app.strip()
+    )
 
     if not input_file.exists():
         log(f"Input file not found: {input_file}")
@@ -141,6 +147,9 @@ def main():
         for row in reader:
             pkg = row.get("pkg_name")
             if not pkg:
+                continue
+            if pkg in excluded_apps:
+                log(f"Skipping excluded app: {pkg}")
                 continue
             if pkg in already_processed:
                 if already_processed[pkg] in desired_categories:
@@ -192,6 +201,9 @@ def main():
         additional_rows = []
         for apk_file in apk_dir.glob("*.apk"):
             pkg = apk_file.stem
+            if pkg in excluded_apps:
+                log(f"Skipping excluded custom app: {pkg}")
+                continue
             if pkg not in existing_pkgs:
                 result = extract_play_store_data(pkg)
                 time.sleep(1)

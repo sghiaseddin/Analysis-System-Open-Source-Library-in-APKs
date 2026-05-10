@@ -3,6 +3,7 @@ import csv
 import os
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from multiprocessing import Process
 import re
 from datetime import datetime
 
@@ -12,6 +13,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Check license citation in decoded APKs")
     parser.add_argument("--input-dir", required=True, help="Path to directory containing summary CSVs")
     parser.add_argument("--input-dir2", required=True, help="Path to decoded apk")
+    parser.add_argument("--excluded-apps", required=False, help="Comma-separated list of apps")
     parser.add_argument("--workers", type=int, default=6, help="Number of worker threads (default: 6)")
     parser.add_argument("--log-every", type=int, default=10, help="Log progress every N repos (default: 10)")
     return parser.parse_args()
@@ -50,6 +52,9 @@ def process_csv(csv_path, workers, log_every, decoded_dir):
     with open(csv_path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         fieldnames = reader.fieldnames
+        if "cited" in fieldnames:
+            log(f"Skipping {csv_path.name}: cited column already exists")
+            return
         if "repo_url" not in fieldnames:
             return
         for row in reader:
@@ -121,9 +126,33 @@ def main():
         log(f"Input directory {decoded_dir} does not exist or is not a directory.")
         return
 
+    excluded_apps = set(
+        app.strip()
+        for app in (args.excluded_apps or "").split(",")
+        if app.strip()
+    )
+
+    timeout_seconds = 5 * 60
+
     for csv_file in csv_files:
+        app_name = csv_file.stem
+        if app_name in excluded_apps:
+            log(f"Skipping excluded app: {app_name}")
+            continue
         log(f"Processing {csv_file.name} ...")
-        process_csv(csv_file, args.workers, args.log_every, decoded_dir)
+
+        process = Process(
+            target=process_csv,
+            args=(csv_file, args.workers, args.log_every, decoded_dir)
+        )
+        process.start()
+        process.join(timeout_seconds)
+
+        if process.is_alive():
+            log(f"Skipping {csv_file.name}: processing exceeded 5 minutes")
+            process.terminate()
+            process.join()
+            continue
 
 if __name__ == "__main__":
     main()
