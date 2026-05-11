@@ -2,7 +2,7 @@
 
 This repository contains an experimental pipeline for identifying open-source libraries embedded in Android APK files. The system was developed for thesis research on dependency transparency in Android applications. It combines license declaration lookup, repository-based fingerprint generation, static APK analysis, citation checking, and GitHub-based repository metrics.
 
-Version: 1.0.1
+Version: 1.1.0
 
 ---
 

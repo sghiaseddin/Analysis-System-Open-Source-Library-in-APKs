@@ -3229,19 +3229,15 @@
     <bcf:citekey order="99" intorder="2">williamsResearchDirectionsSoftware2025</bcf:citekey>
     <bcf:citekey order="99" intorder="3">liOpenSourceHidden2025</bcf:citekey>
     <bcf:citekey order="100" intorder="1">liuAndroZooOpenCollectingLargescale2020</bcf:citekey>
-    <bcf:citekey order="101" intorder="1">borgesUnderstandingFactorsThat2016</bcf:citekey>
-    <bcf:citekey order="102" intorder="1">borgesUnderstandingFactorsThat2016</bcf:citekey>
-    <bcf:citekey order="103" intorder="1">liExploringFactorsMetrics2022</bcf:citekey>
-    <bcf:citekey order="104" intorder="1">coelhoThisGitHubProject2020</bcf:citekey>
-    <bcf:citekey order="105" intorder="1">coelhoThisGitHubProject2020</bcf:citekey>
-    <bcf:citekey order="106" intorder="1">linakerHowCharacterizeHealth2022</bcf:citekey>
-    <bcf:citekey order="107" intorder="1">linakerHowCharacterizeHealth2022</bcf:citekey>
-    <bcf:citekey order="108" intorder="1">coelhoThisGitHubProject2020</bcf:citekey>
-    <bcf:citekey order="109" intorder="1">coelhoThisGitHubProject2020</bcf:citekey>
-    <bcf:citekey order="110" intorder="1">liExploringFactorsMetrics2022</bcf:citekey>
-    <bcf:citekey order="111" intorder="1">liExploringFactorsMetrics2022</bcf:citekey>
-    <bcf:citekey order="112" intorder="1">liExploringFactorsMetrics2022</bcf:citekey>
-    <bcf:citekey order="112" intorder="2">linakerHowCharacterizeHealth2022</bcf:citekey>
+    <bcf:citekey order="101" intorder="1">wangMethodEvaluateHealth2022</bcf:citekey>
+    <bcf:citekey order="102" intorder="1">wangMethodEvaluateHealth2022</bcf:citekey>
+    <bcf:citekey order="103" intorder="1">diruscioOSSMETERSoftwareMeasurement2015</bcf:citekey>
+    <bcf:citekey order="104" intorder="1">jiangMetricsEvaluateHealth2019</bcf:citekey>
+    <bcf:citekey order="105" intorder="1">wangMethodEvaluateHealth2022</bcf:citekey>
+    <bcf:citekey order="106" intorder="1">wangMethodEvaluateHealth2022</bcf:citekey>
+    <bcf:citekey order="107" intorder="1">wangMethodEvaluateHealth2022</bcf:citekey>
+    <bcf:citekey order="108" intorder="1">wangMethodEvaluateHealth2022</bcf:citekey>
+    <bcf:citekey order="109" intorder="1">wangMethodEvaluateHealth2022</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="apa">

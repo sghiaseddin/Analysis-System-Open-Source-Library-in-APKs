@@ -27,12 +27,12 @@
            given={Samuel\bibnamedelima A.},
            giveni={S\bibinitperiod\bibinitdelim A\bibinitperiod},
            givenun=0}}%
-        {{un=0,uniquepart=base,hash=65027af5f4f54f2e6c7bb140253872e2}{%
+        {{un=1,uniquepart=given,hash=65027af5f4f54f2e6c7bb140253872e2}{%
            family={Wu},
            familyi={W\bibinitperiod},
            given={Di},
            giveni={D\bibinitperiod},
-           givenun=0}}%
+           givenun=1}}%
       }
       \strng{namehash}{0f085f60c93300959934c7bdf413b219}
       \strng{fullhash}{0f085f60c93300959934c7bdf413b219}
@@ -123,61 +123,6 @@
       \endverb
       \keyw{Transitive Dependency}
     \endentry
-    \entry{borgesUnderstandingFactorsThat2016}{article}{}{}
-      \name{author}{3}{}{%
-        {{un=0,uniquepart=base,hash=3edd99d257876f7aecd27cf8d3026299}{%
-           family={Borges},
-           familyi={B\bibinitperiod},
-           given={Hudson},
-           giveni={H\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=177388f8935b27f403f6b75201629f44}{%
-           family={Hora},
-           familyi={H\bibinitperiod},
-           given={Andre},
-           giveni={A\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=f324ce400373656751c8c5ec06005410}{%
-           family={Valente},
-           familyi={V\bibinitperiod},
-           given={Marco\bibnamedelima Tulio},
-           giveni={M\bibinitperiod\bibinitdelim T\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{dafdec298be6b99de2cfd690e2ad5408}
-      \strng{fullhash}{acbcabc74f1d9e61327b0942728f0f3a}
-      \strng{fullhashraw}{acbcabc74f1d9e61327b0942728f0f3a}
-      \strng{bibnamehash}{acbcabc74f1d9e61327b0942728f0f3a}
-      \strng{authorbibnamehash}{acbcabc74f1d9e61327b0942728f0f3a}
-      \strng{authornamehash}{dafdec298be6b99de2cfd690e2ad5408}
-      \strng{authorfullhash}{acbcabc74f1d9e61327b0942728f0f3a}
-      \strng{authorfullhashraw}{acbcabc74f1d9e61327b0942728f0f3a}
-      \field{sortinit}{B}
-      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{abstract}{Software popularity is a valuable information to modern open source developers, who constantly want to know if their systems are attracting new users, if new releases are gaining acceptance, or if they are meeting user's expectations. In this paper, we describe a study on the popularity of software systems hosted at GitHub, which is the world's largest collection of open source software. GitHub provides an explicit way for users to manifest their satisfaction with a hosted repository: the stargazers button. In our study, we reveal the main factors that impact the number of stars of GitHub projects, including programming language and application domain. We also study the impact of new features on project popularity. Finally, we identify four main patterns of popularity growth, which are derived after clustering the time series representing the number of stars of 2,279 popular GitHub repositories. We hope our results provide valuable insights to developers and maintainers, which could help them on building and evolving systems in a competitive software market.}
-      \field{journaltitle}{2016 {{IEEE International Conference}} on {{Software Maintenance}} and {{Evolution}} ({{ICSME}})}
-      \field{month}{10}
-      \field{title}{Understanding the {{Factors That Impact}} the {{Popularity}} of {{GitHub Repositories}}}
-      \field{urlday}{4}
-      \field{urlmonth}{5}
-      \field{urlyear}{2026}
-      \field{year}{2016}
-      \field{urldateera}{ce}
-      \field{pages}{334\bibrangedash 344}
-      \range{pages}{11}
-      \verb{doi}
-      \verb 10.1109/ICSME.2016.31
-      \endverb
-      \verb{file}
-      \verb /Users/shayan/Zotero/storage/B2DJBY64/Borges et al. - 2016 - Understanding the Factors That Impact the Popularity of GitHub Repositories.pdf;/Users/shayan/Zotero/storage/JHLB7INS/7816479.html
-      \endverb
-      \keyw{Documentation,GitHub,Github Metrics,HTML,Java,Libraries,Open Source software,Organizations,Social coding,Software,Software Popularity}
-    \endentry
     \entry{chesbroughMeasuringEconomicValue2023}{report}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=d8f5bbb30e3c7fbc2e4d218292ca8a53}{%
@@ -223,70 +168,6 @@
       \verb /Users/shayan/Zotero/storage/N2V8TVI9/Chesbrough - 2023 - Measuring the Economic Value of Open Source A Survey and a Preliminary Analysis.pdf
       \endverb
       \keyw{Benefits}
-    \endentry
-    \entry{coelhoThisGitHubProject2020}{article}{}{}
-      \name{author}{4}{}{%
-        {{un=0,uniquepart=base,hash=ff9cba0d8a506cb622224ab981ed37e6}{%
-           family={Coelho},
-           familyi={C\bibinitperiod},
-           given={Jailton},
-           giveni={J\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=f324ce400373656751c8c5ec06005410}{%
-           family={Valente},
-           familyi={V\bibinitperiod},
-           given={Marco\bibnamedelima Tulio},
-           giveni={M\bibinitperiod\bibinitdelim T\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=50870cdbe55648d081c5fa68b89ab121}{%
-           family={Milen},
-           familyi={M\bibinitperiod},
-           given={Luciano},
-           giveni={L\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=8b3891788d91b0b75c9131c1fdac09a3}{%
-           family={Silva},
-           familyi={S\bibinitperiod},
-           given={Luciana\bibnamedelima L.},
-           giveni={L\bibinitperiod\bibinitdelim L\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{d468a9802da21115115f527de43c5966}
-      \strng{fullhash}{cd9a95bdf8f3cd38d8fe44b1fd743f6a}
-      \strng{fullhashraw}{cd9a95bdf8f3cd38d8fe44b1fd743f6a}
-      \strng{bibnamehash}{cd9a95bdf8f3cd38d8fe44b1fd743f6a}
-      \strng{authorbibnamehash}{cd9a95bdf8f3cd38d8fe44b1fd743f6a}
-      \strng{authornamehash}{d468a9802da21115115f527de43c5966}
-      \strng{authorfullhash}{cd9a95bdf8f3cd38d8fe44b1fd743f6a}
-      \strng{authorfullhashraw}{cd9a95bdf8f3cd38d8fe44b1fd743f6a}
-      \field{sortinit}{C}
-      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{shorttitle}
-      \field{abstract}{Context GitHub hosts an impressive number of high-quality OSS projects. However, selecting ``the right tool for the job'' is a challenging task, because we do not have precise information about those high-quality projects. Objective In this paper, we propose a data-driven approach to measure the level of maintenance activity of GitHub projects. Our goal is to alert users about the risks of using unmaintained projects and possibly motivate other developers to assume the maintenance of such projects. Method We train machine learning models to define a metric to express the level of maintenance activity of GitHub projects. Next, we analyze the historical evolution of 2927 active projects in the time frame of one year. Results From 2927 active projects, 16\% become unmaintained in the interval of one year. We also found that Objective-C projects tend to have lower maintenance activity than projects implemented in other languages. Finally, software tools---such as compilers and editors---have the highest maintenance activity over time. Conclusions A metric about the level of maintenance activity of GitHub projects can help developers to select open source projects.}
-      \field{issn}{0950-5849}
-      \field{journaltitle}{Information and Software Technology}
-      \field{month}{6}
-      \field{shorttitle}{Is This {{GitHub}} Project Maintained?}
-      \field{title}{Is This {{GitHub}} Project Maintained? {{Measuring}} the Level of Maintenance Activity of Open-Source Projects}
-      \field{urlday}{4}
-      \field{urlmonth}{5}
-      \field{urlyear}{2026}
-      \field{volume}{122}
-      \field{year}{2020}
-      \field{urldateera}{ce}
-      \field{pages}{106274}
-      \range{pages}{1}
-      \verb{doi}
-      \verb 10.1016/j.infsof.2020.106274
-      \endverb
-      \verb{file}
-      \verb /Users/shayan/Zotero/storage/XIUIGXJD/Coelho et al. - 2020 - Is this GitHub project maintained Measuring the level of maintenance activity of open-source projec.pdf;/Users/shayan/Zotero/storage/M9HLYK4A/S0950584920300240.html
-      \endverb
-      \keyw{GitHub,Github Metrics,Open source software,Unmaintained projects}
     \endentry
     \entry{cordeySoftwareSupplyChain2023}{report}{}{}
       \name{author}{1}{}{%
@@ -544,6 +425,81 @@
       \endverb
       \keyw{Computer Science - Software Engineering,History}
     \endentry
+    \entry{diruscioOSSMETERSoftwareMeasurement2015}{article}{}{}
+      \name{author}{5}{}{%
+        {{un=0,uniquepart=base,hash=4f89e18da939d2df2931b7fb2951afb5}{%
+           family={Di\bibnamedelima Ruscio},
+           familyi={D\bibinitperiod\bibinitdelim R\bibinitperiod},
+           given={Davide},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=815286edbfade2ec037bc94624f6315a}{%
+           family={Kolovos},
+           familyi={K\bibinitperiod},
+           given={Dimitris\bibnamedelima S.},
+           giveni={D\bibinitperiod\bibinitdelim S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=c4c755af477d4f7a8a464e8985547e11}{%
+           family={Korkontzelos},
+           familyi={K\bibinitperiod},
+           given={Ioannis},
+           giveni={I\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=60dafaffc5c4158e6c62301787a29421}{%
+           family={Matragkas},
+           familyi={M\bibinitperiod},
+           given={Nicholas},
+           giveni={N\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=9b5ece762133bc66d24de65570707b6e}{%
+           family={Vinju},
+           familyi={V\bibinitperiod},
+           given={Jurgen\bibnamedelima J.},
+           giveni={J\bibinitperiod\bibinitdelim J\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {New York, NY, USA}%
+      }
+      \list{publisher}{1}{%
+        {Association for Computing Machinery}%
+      }
+      \strng{namehash}{236270e602e66874c131746f561e14cb}
+      \strng{fullhash}{f9bbc85272031aff5784b8f05271527d}
+      \strng{fullhashraw}{f9bbc85272031aff5784b8f05271527d}
+      \strng{bibnamehash}{f9bbc85272031aff5784b8f05271527d}
+      \strng{authorbibnamehash}{f9bbc85272031aff5784b8f05271527d}
+      \strng{authornamehash}{236270e602e66874c131746f561e14cb}
+      \strng{authorfullhash}{f9bbc85272031aff5784b8f05271527d}
+      \strng{authorfullhashraw}{f9bbc85272031aff5784b8f05271527d}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{Deciding whether an open source software (OSS) project meets the required standards for adoption in terms of quality, maturity, activity of development and user support is not a straightforward process as it involves exploring various sources of information. Such sources include OSS source code repositories, communication channels such as newsgroups, forums, and mailing lists, as well as issue tracking systems. OSSMETER is an extensible and scalable platform that can monitor and incrementally analyse a large number of OSS projects. The results of this analysis can be used to assess various aspects of OSS projects, and to directly compare different OSS projects with each other.}
+      \field{isbn}{978-1-4503-3675-8}
+      \field{journaltitle}{Proceedings of the 2015 10th {{Joint Meeting}} on {{Foundations}} of {{Software Engineering}}}
+      \field{month}{8}
+      \field{series}{{{ESEC}}/{{FSE}} 2015}
+      \field{shorttitle}{{{OSSMETER}}}
+      \field{title}{{{OSSMETER}}: A Software Measurement Platform for Automatically Analysing Open Source Software Projects}
+      \field{urlday}{10}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2015}
+      \field{urldateera}{ce}
+      \field{pages}{970\bibrangedash 973}
+      \range{pages}{4}
+      \verb{doi}
+      \verb 10.1145/2786805.2803186
+      \endverb
+      \verb{file}
+      \verb /Users/shayan/Zotero/storage/J83EA2R4/Di Ruscio et al. - 2015 - OSSMETER a software measurement platform for automatically analysing open source software projects.pdf
+      \endverb
+    \endentry
     \entry{OpenSourceSecurity2026}{report}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=09f164da2c3581577252946b817f7767}{%
@@ -782,6 +738,92 @@
       \endverb
       \keyw{Benefits}
     \endentry
+    \entry{jiangMetricsEvaluateHealth2019}{inbook}{}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=991cd16ddffd881e8fdba13a3703ca89}{%
+           family={Jiang},
+           familyi={J\bibinitperiod},
+           given={Sha},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3f63d8de2975d0bddc2dd877029a2cae}{%
+           family={Cao},
+           familyi={C\bibinitperiod},
+           given={Jian},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=68301785f41847cc41bbc2a5227c0016}{%
+           family={Prasad},
+           familyi={P\bibinitperiod},
+           given={Mukesh},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \name{editor}{5}{}{%
+        {{hash=0334eac092126f3b6b3774508bfa6a6b}{%
+           family={Sun},
+           familyi={S\bibinitperiod},
+           given={Yuqing},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=30e957c6dae9f45dbbafb558b704abf6}{%
+           family={Lu},
+           familyi={L\bibinitperiod},
+           given={Tun},
+           giveni={T\bibinitperiod}}}%
+        {{hash=4ba4ee8ed3131f701ef168d88fcff9ff}{%
+           family={Yu},
+           familyi={Y\bibinitperiod},
+           given={Zhengtao},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=89d95f188af2fabffbb4575452378217}{%
+           family={Fan},
+           familyi={F\bibinitperiod},
+           given={Hongfei},
+           giveni={H\bibinitperiod}}}%
+        {{hash=aaa0b4dbe6c33cff10ef5a938bea63c1}{%
+           family={Gao},
+           familyi={G\bibinitperiod},
+           given={Liping},
+           giveni={L\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Singapore}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{6e5eb0d3c7fc154659f7d1c14e441917}
+      \strng{fullhash}{69963c669ee8f379275049a09541052a}
+      \strng{fullhashraw}{69963c669ee8f379275049a09541052a}
+      \strng{bibnamehash}{69963c669ee8f379275049a09541052a}
+      \strng{authorbibnamehash}{69963c669ee8f379275049a09541052a}
+      \strng{authornamehash}{6e5eb0d3c7fc154659f7d1c14e441917}
+      \strng{authorfullhash}{69963c669ee8f379275049a09541052a}
+      \strng{authorfullhashraw}{69963c669ee8f379275049a09541052a}
+      \strng{editorbibnamehash}{5efeddaaca956d2586add9781e4a930a}
+      \strng{editornamehash}{30d48d0786c8020587dd22d8efbd38a4}
+      \strng{editorfullhash}{5efeddaaca956d2586add9781e4a930a}
+      \strng{editorfullhashraw}{5efeddaaca956d2586add9781e4a930a}
+      \field{sortinit}{J}
+      \field{sortinithash}{b2f54a9081ace9966a7cb9413811edb4}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{As open-source software (OSS) development is becoming a trend, an increasing number of businesses and developers are joining OSS projects. For project managers, developers and users, understanding the current health status of a project is very important to manage a development process, select the open-source projects to development or to adopt the software packages developed by projects. Therefore, an efficient approach to evaluate the health status of the open-source project is needed. Unfortunately, although many approaches including metrics have been proposed, they are designed in arbitrary ways. In this paper, a math ematical tool, i.e., factor analysis, is used to build a health evaluation model for OSS projects. As far as we know, this is the first time that factor analysis has been applied to evaluate OSS projects. This model is based on GitHub data and uses the basic indexes that are closely related to the health status of the projects as the input. Then, six new synthetic metrics, namely community activity, project popularity, development activity, completeness, responsiveness and persistence are obtained through factor analysis, which can be used to calculate the overall health score of a project. Moreover, in order to verify the effectiveness of this model, it is applied to some real projects and the results show that the overall scores achieved by this model can reflect the health status of the projects.}
+      \field{booktitle}{Computer {{Supported Cooperative Work}} and {{Social Computing}}}
+      \field{isbn}{978-981-15-1377-0}
+      \field{langid}{english}
+      \field{title}{The {{Metrics}} to {{Evaluate}} the {{Health Status}} of {{OSS Projects Based}} on {{Factor Analysis}}}
+      \field{year}{2019}
+      \field{pages}{723\bibrangedash 737}
+      \range{pages}{15}
+      \verb{doi}
+      \verb 10.1007/978-981-15-1377-0_56
+      \endverb
+      \keyw{Factor analysis,Health status,Open source software project}
+    \endentry
     \entry{kumarComprehensiveStudyImpact2024}{article}{}{}
       \name{author}{5}{}{%
         {{un=0,uniquepart=base,hash=b085a1aceac16f4a29d46cc9a93c7c5e}{%
@@ -960,12 +1002,12 @@
     \endentry
     \entry{liOpenSourceHidden2025}{article}{}{}
       \name{author}{6}{}{%
-        {{un=1,uniquepart=given,hash=4d885d9c631dc108729002d3e4751cf2}{%
+        {{un=0,uniquepart=base,hash=4d885d9c631dc108729002d3e4751cf2}{%
            family={Li},
            familyi={L\bibinitperiod},
            given={Boyuan},
            giveni={B\bibinitperiod},
-           givenun=1}}%
+           givenun=0}}%
         {{un=0,uniquepart=base,hash=30b278deffb74289c6aea3469e1ac95e}{%
            family={Liu},
            familyi={L\bibinitperiod},
@@ -1009,6 +1051,7 @@
       \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
       \field{extradatescope}{labelyear}
       \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{shorttitle}
       \field{abstract}{Integrating third-party software components is a common practice in modern software development, offering significant advantages in terms of efficiency and innovation. However, this practice is fraught with risks related to software licensing. A lack of understanding may lead to disputes, which can pose serious legal and operational challenges. To these ends, both academia and industry have conducted various investigations and proposed solutions and tools to deal with these challenges. However, significant limitations still remain. Moreover, the rapid evolution of open-source software (OSS) licenses, as well as the rapidly incorporated generative software engineering techniques, such as large language models for code (CodeLLMs), are placing greater demands on the systematic management of software license risks. To unveil the severe challenges and explore possible future directions, we conduct the first systematic literature review (SLR) on 80 carefully selected OSS license-related papers, classifying existing research into three key categories, i.e., license identification, license risk assessment, and license risk mitigation. Based on these, we discuss challenges in existing solutions, conclude the opportunities to shed light on future research directions and offer practical recommendations for practitioners. We hope this thorough review will help bridge the gaps between academia and industry and accelerate the ecosystem-wide governance of legitimate software risks within the software engineering community.}
@@ -1033,69 +1076,6 @@
       \verb /Users/shayan/Zotero/storage/LE4TKUBF/Li et al. - 2025 - Open Source, Hidden Costs A Systematic Literature Review on OSS License Management.pdf;/Users/shayan/Zotero/storage/AAJAAL9J/11072183.html
       \endverb
       \keyw{Codes,Industries,Law,Legal factors,Licenses,Literature Review,Open source software,OSS,OSS license management,Search problems,Software,systematic literature review,Systematic literature review,Taxonomy}
-    \endentry
-    \entry{liExploringFactorsMetrics2022}{article}{}{}
-      \name{author}{4}{}{%
-        {{un=1,uniquepart=given,hash=a6b86154c32efdc6df26d990392dc07c}{%
-           family={Li},
-           familyi={L\bibinitperiod},
-           given={Xiaozhou},
-           giveni={X\bibinitperiod},
-           givenun=1}}%
-        {{un=0,uniquepart=base,hash=f34eee2215343558748e8080f6ea356d}{%
-           family={Moreschini},
-           familyi={M\bibinitperiod},
-           given={Sergio},
-           giveni={S\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=070032ef28f057f2f06b2a3879e3f70c}{%
-           family={Zhang},
-           familyi={Z\bibinitperiod},
-           given={Zheying},
-           giveni={Z\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=4d08ae1a3f71e9cc303d7cc0722f5186}{%
-           family={Taibi},
-           familyi={T\bibinitperiod},
-           given={Davide},
-           giveni={D\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{359a3b687b8e4973ad0170a375289a33}
-      \strng{fullhash}{2c58c3963678a732864e0dc0995a2f7c}
-      \strng{fullhashraw}{2c58c3963678a732864e0dc0995a2f7c}
-      \strng{bibnamehash}{2c58c3963678a732864e0dc0995a2f7c}
-      \strng{authorbibnamehash}{2c58c3963678a732864e0dc0995a2f7c}
-      \strng{authornamehash}{359a3b687b8e4973ad0170a375289a33}
-      \strng{authorfullhash}{2c58c3963678a732864e0dc0995a2f7c}
-      \strng{authorfullhashraw}{2c58c3963678a732864e0dc0995a2f7c}
-      \field{sortinit}{L}
-      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{shorttitle}
-      \field{abstract}{Context: Open Source Software (OSS) is nowadays used and integrated in most of the commercial products. However, the selection of OSS projects for integration is not a simple process, mainly due to a of lack of clear selection models and lack of information from the OSS portals. Objective: We investigate the factors and metrics that practitioners currently consider when selecting OSS. We also investigate the source of information and portals that can be used to assess the factors, as well as the possibility to automatically extract such information with APIs. Method: We elicited the factors and the metrics adopted to assess and compare OSS performing a survey among 23 experienced developers who often integrate OSS in the software they develop. Moreover, we investigated the APIs of the portals adopted to assess OSS extracting information for the most starred 100K projects in GitHub. Result: We identified a set consisting of 8 main factors and 74 sub-factors, together with 170 related metrics that companies can use to select OSS to be integrated in their software projects. Unexpectedly, only a small part of the factors can be evaluated automatically, and out of 170 metrics, only 40 are available, of which only 22 returned information for all the 100K projects. Therefore, we recommend project maintainers and project repositories to pay attention to provide information for the project they are hosting, so as to increase the likelihood of being adopted. Conclusion: OSS selection can be partially automated, by extracting the information needed for the selection from portal APIs. OSS producers can benefit from our results by checking if they are providing all the information commonly required by potential adopters. Developers can benefit from our results, using the list of factors we selected as a checklist during the selection of OSS, or using the APIs we developed to automatically extract the data from OSS projects.}
-      \field{issn}{0164-1212}
-      \field{journaltitle}{Journal of Systems and Software}
-      \field{month}{6}
-      \field{shorttitle}{Exploring Factors and Metrics to Select Open Source Software Components for Integration}
-      \field{title}{Exploring Factors and Metrics to Select Open Source Software Components for Integration: {{An}} Empirical Study}
-      \field{urlday}{4}
-      \field{urlmonth}{5}
-      \field{urlyear}{2026}
-      \field{volume}{188}
-      \field{year}{2022}
-      \field{urldateera}{ce}
-      \field{pages}{111255}
-      \range{pages}{1}
-      \verb{doi}
-      \verb 10.1016/j.jss.2022.111255
-      \endverb
-      \verb{file}
-      \verb /Users/shayan/Zotero/storage/RVWUNNBM/Li et al. - 2022 - Exploring factors and metrics to select open source software components for integration An empirica.pdf;/Users/shayan/Zotero/storage/WEJL7CYQ/S0164121222000267.html
-      \endverb
-      \keyw{Github Metrics,Open source,Open source adoption,Software selection}
     \endentry
     \entry{LibrariesioSecurityMaintenance2026}{online}{}{}
       \list{organization}{1}{%
@@ -1126,70 +1106,6 @@
       \verb{url}
       \verb https://libraries.io
       \endverb
-    \endentry
-    \entry{linakerHowCharacterizeHealth2022}{article}{}{}
-      \name{author}{3}{}{%
-        {{un=0,uniquepart=base,hash=78845484a1e9b8f8c480077855155c68}{%
-           family={Lin{å}ker},
-           familyi={L\bibinitperiod},
-           given={Johan},
-           giveni={J\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=d69da57f7efda3a99a2a55ac0dc31f35}{%
-           family={Papatheocharous},
-           familyi={P\bibinitperiod},
-           given={Efi},
-           giveni={E\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=6e820adc2747cef9f9a7b49079e412ee}{%
-           family={Olsson},
-           familyi={O\bibinitperiod},
-           given={Thomas},
-           giveni={T\bibinitperiod},
-           givenun=0}}%
-      }
-      \list{location}{1}{%
-        {New York, NY, USA}%
-      }
-      \list{publisher}{1}{%
-        {Association for Computing Machinery}%
-      }
-      \strng{namehash}{51148f59675ee08de56f5bb79c33d170}
-      \strng{fullhash}{66e7c9cb6b64ecb3fbc01cc699dbf396}
-      \strng{fullhashraw}{66e7c9cb6b64ecb3fbc01cc699dbf396}
-      \strng{bibnamehash}{66e7c9cb6b64ecb3fbc01cc699dbf396}
-      \strng{authorbibnamehash}{66e7c9cb6b64ecb3fbc01cc699dbf396}
-      \strng{authornamehash}{51148f59675ee08de56f5bb79c33d170}
-      \strng{authorfullhash}{66e7c9cb6b64ecb3fbc01cc699dbf396}
-      \strng{authorfullhashraw}{66e7c9cb6b64ecb3fbc01cc699dbf396}
-      \field{sortinit}{L}
-      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{shorttitle}
-      \field{abstract}{Motivation: Society's dependence on Open Source Software (OSS) and the communities that maintain the OSS is ever-growing. So are the potential risks of, e.g., vulnerabilities being introduced in projects not actively maintained. By assessing an OSS project's capability to stay viable and maintained over time without interruption or weakening, i.e., the OSS health, users can consider the risk implied by using the OSS as is, and if necessary, decide whether to help improve the health or choose another option. However, such assessment is complex as OSS health covers a wide range of sub-topics, and existing support is limited. Aim: We aim to create an overview of characteristics that affect the health of an OSS project and enable the assessment thereof. Method: We conduct a snowball literature review based on a start set of 9 papers, and identify 146 relevant papers over two iterations of forward and backward snowballing. Health characteristics are elicited and coded using structured and axial coding into a framework structure. Results: The final framework consists of 107 health characteristics divided among 15 themes. Characteristics address the socio-technical spectrum of the community of actors maintaining the OSS project, the software and other deliverables being maintained, and the orchestration facilitating the maintenance. Characteristics are further divided based on the level of abstraction they address, i.e., the OSS project-level specifically, or the project's overarching ecosystem of related OSS projects. Conclusion: The framework provides an overview of the wide span of health characteristics that may need to be considered when evaluating OSS health and can serve as a foundation both for research and practice.}
-      \field{isbn}{978-1-4503-9845-9}
-      \field{journaltitle}{Proceedings of the 18th {{International Symposium}} on {{Open Collaboration}}}
-      \field{month}{9}
-      \field{series}{{{OpenSym}} '22}
-      \field{shorttitle}{How to Characterize the Health of an {{Open Source Software}} Project?}
-      \field{title}{How to Characterize the Health of an {{Open Source Software}} Project? {{A}} Snowball Literature Review of an Emerging Practice}
-      \field{urlday}{4}
-      \field{urlmonth}{5}
-      \field{urlyear}{2026}
-      \field{year}{2022}
-      \field{urldateera}{ce}
-      \field{pages}{1\bibrangedash 12}
-      \range{pages}{12}
-      \verb{doi}
-      \verb 10.1145/3555051.3555067
-      \endverb
-      \verb{file}
-      \verb /Users/shayan/Zotero/storage/XA6AGSLW/Linåker et al. - 2022 - How to characterize the health of an Open Source Software project A snowball literature review of a.pdf
-      \endverb
-      \keyw{Github Metrics}
     \endentry
     \entry{liuDemystifyingVulnerabilityPropagation2022}{article}{}{}
       \name{author}{6}{}{%
@@ -2004,6 +1920,63 @@
       \verb{url}
       \verb https://deepstrike.io/blog/vulnerability-statistics-2025
       \endverb
+    \endentry
+    \entry{wangMethodEvaluateHealth2022}{article}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=8d5a708450d2bb3fcd442491beff9bc5}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Hongbing},
+           giveni={H\bibinitperiod},
+           givenun=0}}%
+        {{un=1,uniquepart=given,hash=af80cc92714f2d7d01040a19156916ef}{%
+           family={Wu},
+           familyi={W\bibinitperiod},
+           given={Zimin},
+           giveni={Z\bibinitperiod},
+           givenun=1}}%
+      }
+      \strng{namehash}{d7e96184547357720ad05c4f4e03151c}
+      \strng{fullhash}{d7e96184547357720ad05c4f4e03151c}
+      \strng{fullhashraw}{d7e96184547357720ad05c4f4e03151c}
+      \strng{bibnamehash}{d7e96184547357720ad05c4f4e03151c}
+      \strng{authorbibnamehash}{d7e96184547357720ad05c4f4e03151c}
+      \strng{authornamehash}{d7e96184547357720ad05c4f4e03151c}
+      \strng{authorfullhash}{d7e96184547357720ad05c4f4e03151c}
+      \strng{authorfullhashraw}{d7e96184547357720ad05c4f4e03151c}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{With the rapid development of open-source software (OSS), an increasing number of enterprises and developers have gradually joined OSS projects. OSS development has become a growing trend. For users, developers, and managers of OSS projects, understanding the health status of a project is conducive to making correct decisions and preventing the risks caused by a decline in the project's health. Therefore, an effective method is needed to evaluate the health of OSS projects. Based on the pressure state response (PSR) model, this paper propose a health evaluation model for OSS projects, defines t he healthof OSS projects from the three levels of pressure, state and response, and selects scientific, reasonable a nd representative indicators. The weight of each index is determined by the combination weighting method, which combines AHP and the entropy method. The health of the project is quantitatively analyzed, and the overall health score of a project is calculated. In addition, to verify the effectiveness of the proposed evaluation model, we conduct an empirical experiment based on real project data on the GitHub open-source platform. The experiment results and analysis show that our evaluation model can effectively reflect the health status of OSS projects.}
+      \field{eventtitle}{2022 {{IEEE}} 2nd {{International Conference}} on {{Software Engineering}} and {{Artificial Intelligence}} ({{SEAI}})}
+      \field{journaltitle}{2022 {{IEEE}} 2nd {{International Conference}} on {{Software Engineering}} and {{Artificial Intelligence}} ({{SEAI}})}
+      \field{month}{6}
+      \field{title}{A {{Method}} to {{Evaluate}} the {{Health}} of {{OSS Projects Based}} on the {{PSR Model}} and {{Combination Weighting}}}
+      \field{urlday}{11}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2022}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{109\bibrangedash 118}
+      \range{pages}{10}
+      \verb{doi}
+      \verb 10.1109/SEAI55746.2022.9832291
+      \endverb
+      \verb{file}
+      \verb /Users/shayan/Zotero/storage/AL6QK67A/Wang and Wu - 2022 - A Method to Evaluate the Health of OSS Projects Based on the PSR Model and Combination Weighting.pdf;/Users/shayan/Zotero/storage/IA7UU7JD/9832291.html
+      \endverb
+      \verb{urlraw}
+      \verb https://ieeexplore.ieee.org/document/9832291
+      \endverb
+      \verb{url}
+      \verb https://ieeexplore.ieee.org/document/9832291
+      \endverb
+      \keyw{Analytical models,Biological system modeling,combination weighting,Data models,Ecosystems,Entropy,health evaluation,Indexes,Market research,open-source software,PSR}
     \endentry
     \entry{weberPoliticalEconomyOpen2000}{article}{}{}
       \name{author}{1}{}{%
@@ -2584,12 +2557,12 @@
            given={Samuel\bibnamedelima A.},
            giveni={S\bibinitperiod\bibinitdelim A\bibinitperiod},
            givenun=0}}%
-        {{un=0,uniquepart=base,hash=65027af5f4f54f2e6c7bb140253872e2}{%
+        {{un=1,uniquepart=given,hash=65027af5f4f54f2e6c7bb140253872e2}{%
            family={Wu},
            familyi={W\bibinitperiod},
            given={Di},
            giveni={D\bibinitperiod},
-           givenun=0}}%
+           givenun=1}}%
       }
       \strng{namehash}{0f085f60c93300959934c7bdf413b219}
       \strng{fullhash}{0f085f60c93300959934c7bdf413b219}
@@ -2680,61 +2653,6 @@
       \endverb
       \keyw{Transitive Dependency}
     \endentry
-    \entry{borgesUnderstandingFactorsThat2016}{article}{}{}
-      \name{author}{3}{}{%
-        {{un=0,uniquepart=base,hash=3edd99d257876f7aecd27cf8d3026299}{%
-           family={Borges},
-           familyi={B\bibinitperiod},
-           given={Hudson},
-           giveni={H\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=177388f8935b27f403f6b75201629f44}{%
-           family={Hora},
-           familyi={H\bibinitperiod},
-           given={Andre},
-           giveni={A\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=f324ce400373656751c8c5ec06005410}{%
-           family={Valente},
-           familyi={V\bibinitperiod},
-           given={Marco\bibnamedelima Tulio},
-           giveni={M\bibinitperiod\bibinitdelim T\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{dafdec298be6b99de2cfd690e2ad5408}
-      \strng{fullhash}{acbcabc74f1d9e61327b0942728f0f3a}
-      \strng{fullhashraw}{acbcabc74f1d9e61327b0942728f0f3a}
-      \strng{bibnamehash}{acbcabc74f1d9e61327b0942728f0f3a}
-      \strng{authorbibnamehash}{acbcabc74f1d9e61327b0942728f0f3a}
-      \strng{authornamehash}{dafdec298be6b99de2cfd690e2ad5408}
-      \strng{authorfullhash}{acbcabc74f1d9e61327b0942728f0f3a}
-      \strng{authorfullhashraw}{acbcabc74f1d9e61327b0942728f0f3a}
-      \field{sortinit}{B}
-      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{abstract}{Software popularity is a valuable information to modern open source developers, who constantly want to know if their systems are attracting new users, if new releases are gaining acceptance, or if they are meeting user's expectations. In this paper, we describe a study on the popularity of software systems hosted at GitHub, which is the world's largest collection of open source software. GitHub provides an explicit way for users to manifest their satisfaction with a hosted repository: the stargazers button. In our study, we reveal the main factors that impact the number of stars of GitHub projects, including programming language and application domain. We also study the impact of new features on project popularity. Finally, we identify four main patterns of popularity growth, which are derived after clustering the time series representing the number of stars of 2,279 popular GitHub repositories. We hope our results provide valuable insights to developers and maintainers, which could help them on building and evolving systems in a competitive software market.}
-      \field{journaltitle}{2016 {{IEEE International Conference}} on {{Software Maintenance}} and {{Evolution}} ({{ICSME}})}
-      \field{month}{10}
-      \field{title}{Understanding the {{Factors That Impact}} the {{Popularity}} of {{GitHub Repositories}}}
-      \field{urlday}{4}
-      \field{urlmonth}{5}
-      \field{urlyear}{2026}
-      \field{year}{2016}
-      \field{urldateera}{ce}
-      \field{pages}{334\bibrangedash 344}
-      \range{pages}{11}
-      \verb{doi}
-      \verb 10.1109/ICSME.2016.31
-      \endverb
-      \verb{file}
-      \verb /Users/shayan/Zotero/storage/B2DJBY64/Borges et al. - 2016 - Understanding the Factors That Impact the Popularity of GitHub Repositories.pdf;/Users/shayan/Zotero/storage/JHLB7INS/7816479.html
-      \endverb
-      \keyw{Documentation,GitHub,Github Metrics,HTML,Java,Libraries,Open Source software,Organizations,Social coding,Software,Software Popularity}
-    \endentry
     \entry{chesbroughMeasuringEconomicValue2023}{report}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=d8f5bbb30e3c7fbc2e4d218292ca8a53}{%
@@ -2780,70 +2698,6 @@
       \verb /Users/shayan/Zotero/storage/N2V8TVI9/Chesbrough - 2023 - Measuring the Economic Value of Open Source A Survey and a Preliminary Analysis.pdf
       \endverb
       \keyw{Benefits}
-    \endentry
-    \entry{coelhoThisGitHubProject2020}{article}{}{}
-      \name{author}{4}{}{%
-        {{un=0,uniquepart=base,hash=ff9cba0d8a506cb622224ab981ed37e6}{%
-           family={Coelho},
-           familyi={C\bibinitperiod},
-           given={Jailton},
-           giveni={J\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=f324ce400373656751c8c5ec06005410}{%
-           family={Valente},
-           familyi={V\bibinitperiod},
-           given={Marco\bibnamedelima Tulio},
-           giveni={M\bibinitperiod\bibinitdelim T\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=50870cdbe55648d081c5fa68b89ab121}{%
-           family={Milen},
-           familyi={M\bibinitperiod},
-           given={Luciano},
-           giveni={L\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=8b3891788d91b0b75c9131c1fdac09a3}{%
-           family={Silva},
-           familyi={S\bibinitperiod},
-           given={Luciana\bibnamedelima L.},
-           giveni={L\bibinitperiod\bibinitdelim L\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{d468a9802da21115115f527de43c5966}
-      \strng{fullhash}{cd9a95bdf8f3cd38d8fe44b1fd743f6a}
-      \strng{fullhashraw}{cd9a95bdf8f3cd38d8fe44b1fd743f6a}
-      \strng{bibnamehash}{cd9a95bdf8f3cd38d8fe44b1fd743f6a}
-      \strng{authorbibnamehash}{cd9a95bdf8f3cd38d8fe44b1fd743f6a}
-      \strng{authornamehash}{d468a9802da21115115f527de43c5966}
-      \strng{authorfullhash}{cd9a95bdf8f3cd38d8fe44b1fd743f6a}
-      \strng{authorfullhashraw}{cd9a95bdf8f3cd38d8fe44b1fd743f6a}
-      \field{sortinit}{C}
-      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{shorttitle}
-      \field{abstract}{Context GitHub hosts an impressive number of high-quality OSS projects. However, selecting ``the right tool for the job'' is a challenging task, because we do not have precise information about those high-quality projects. Objective In this paper, we propose a data-driven approach to measure the level of maintenance activity of GitHub projects. Our goal is to alert users about the risks of using unmaintained projects and possibly motivate other developers to assume the maintenance of such projects. Method We train machine learning models to define a metric to express the level of maintenance activity of GitHub projects. Next, we analyze the historical evolution of 2927 active projects in the time frame of one year. Results From 2927 active projects, 16\% become unmaintained in the interval of one year. We also found that Objective-C projects tend to have lower maintenance activity than projects implemented in other languages. Finally, software tools---such as compilers and editors---have the highest maintenance activity over time. Conclusions A metric about the level of maintenance activity of GitHub projects can help developers to select open source projects.}
-      \field{issn}{0950-5849}
-      \field{journaltitle}{Information and Software Technology}
-      \field{month}{6}
-      \field{shorttitle}{Is This {{GitHub}} Project Maintained?}
-      \field{title}{Is This {{GitHub}} Project Maintained? {{Measuring}} the Level of Maintenance Activity of Open-Source Projects}
-      \field{urlday}{4}
-      \field{urlmonth}{5}
-      \field{urlyear}{2026}
-      \field{volume}{122}
-      \field{year}{2020}
-      \field{urldateera}{ce}
-      \field{pages}{106274}
-      \range{pages}{1}
-      \verb{doi}
-      \verb 10.1016/j.infsof.2020.106274
-      \endverb
-      \verb{file}
-      \verb /Users/shayan/Zotero/storage/XIUIGXJD/Coelho et al. - 2020 - Is this GitHub project maintained Measuring the level of maintenance activity of open-source projec.pdf;/Users/shayan/Zotero/storage/M9HLYK4A/S0950584920300240.html
-      \endverb
-      \keyw{GitHub,Github Metrics,Open source software,Unmaintained projects}
     \endentry
     \entry{cordeySoftwareSupplyChain2023}{report}{}{}
       \name{author}{1}{}{%
@@ -3101,6 +2955,81 @@
       \endverb
       \keyw{Computer Science - Software Engineering,History}
     \endentry
+    \entry{diruscioOSSMETERSoftwareMeasurement2015}{article}{}{}
+      \name{author}{5}{}{%
+        {{un=0,uniquepart=base,hash=4f89e18da939d2df2931b7fb2951afb5}{%
+           family={Di\bibnamedelima Ruscio},
+           familyi={D\bibinitperiod\bibinitdelim R\bibinitperiod},
+           given={Davide},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=815286edbfade2ec037bc94624f6315a}{%
+           family={Kolovos},
+           familyi={K\bibinitperiod},
+           given={Dimitris\bibnamedelima S.},
+           giveni={D\bibinitperiod\bibinitdelim S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=c4c755af477d4f7a8a464e8985547e11}{%
+           family={Korkontzelos},
+           familyi={K\bibinitperiod},
+           given={Ioannis},
+           giveni={I\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=60dafaffc5c4158e6c62301787a29421}{%
+           family={Matragkas},
+           familyi={M\bibinitperiod},
+           given={Nicholas},
+           giveni={N\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=9b5ece762133bc66d24de65570707b6e}{%
+           family={Vinju},
+           familyi={V\bibinitperiod},
+           given={Jurgen\bibnamedelima J.},
+           giveni={J\bibinitperiod\bibinitdelim J\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {New York, NY, USA}%
+      }
+      \list{publisher}{1}{%
+        {Association for Computing Machinery}%
+      }
+      \strng{namehash}{236270e602e66874c131746f561e14cb}
+      \strng{fullhash}{f9bbc85272031aff5784b8f05271527d}
+      \strng{fullhashraw}{f9bbc85272031aff5784b8f05271527d}
+      \strng{bibnamehash}{f9bbc85272031aff5784b8f05271527d}
+      \strng{authorbibnamehash}{f9bbc85272031aff5784b8f05271527d}
+      \strng{authornamehash}{236270e602e66874c131746f561e14cb}
+      \strng{authorfullhash}{f9bbc85272031aff5784b8f05271527d}
+      \strng{authorfullhashraw}{f9bbc85272031aff5784b8f05271527d}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{Deciding whether an open source software (OSS) project meets the required standards for adoption in terms of quality, maturity, activity of development and user support is not a straightforward process as it involves exploring various sources of information. Such sources include OSS source code repositories, communication channels such as newsgroups, forums, and mailing lists, as well as issue tracking systems. OSSMETER is an extensible and scalable platform that can monitor and incrementally analyse a large number of OSS projects. The results of this analysis can be used to assess various aspects of OSS projects, and to directly compare different OSS projects with each other.}
+      \field{isbn}{978-1-4503-3675-8}
+      \field{journaltitle}{Proceedings of the 2015 10th {{Joint Meeting}} on {{Foundations}} of {{Software Engineering}}}
+      \field{month}{8}
+      \field{series}{{{ESEC}}/{{FSE}} 2015}
+      \field{shorttitle}{{{OSSMETER}}}
+      \field{title}{{{OSSMETER}}: A Software Measurement Platform for Automatically Analysing Open Source Software Projects}
+      \field{urlday}{10}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2015}
+      \field{urldateera}{ce}
+      \field{pages}{970\bibrangedash 973}
+      \range{pages}{4}
+      \verb{doi}
+      \verb 10.1145/2786805.2803186
+      \endverb
+      \verb{file}
+      \verb /Users/shayan/Zotero/storage/J83EA2R4/Di Ruscio et al. - 2015 - OSSMETER a software measurement platform for automatically analysing open source software projects.pdf
+      \endverb
+    \endentry
     \entry{OpenSourceSecurity2026}{report}{}{}
       \name{author}{1}{}{%
         {{un=0,uniquepart=base,hash=09f164da2c3581577252946b817f7767}{%
@@ -3339,6 +3268,92 @@
       \endverb
       \keyw{Benefits}
     \endentry
+    \entry{jiangMetricsEvaluateHealth2019}{inbook}{}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=991cd16ddffd881e8fdba13a3703ca89}{%
+           family={Jiang},
+           familyi={J\bibinitperiod},
+           given={Sha},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3f63d8de2975d0bddc2dd877029a2cae}{%
+           family={Cao},
+           familyi={C\bibinitperiod},
+           given={Jian},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=68301785f41847cc41bbc2a5227c0016}{%
+           family={Prasad},
+           familyi={P\bibinitperiod},
+           given={Mukesh},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \name{editor}{5}{}{%
+        {{hash=0334eac092126f3b6b3774508bfa6a6b}{%
+           family={Sun},
+           familyi={S\bibinitperiod},
+           given={Yuqing},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=30e957c6dae9f45dbbafb558b704abf6}{%
+           family={Lu},
+           familyi={L\bibinitperiod},
+           given={Tun},
+           giveni={T\bibinitperiod}}}%
+        {{hash=4ba4ee8ed3131f701ef168d88fcff9ff}{%
+           family={Yu},
+           familyi={Y\bibinitperiod},
+           given={Zhengtao},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=89d95f188af2fabffbb4575452378217}{%
+           family={Fan},
+           familyi={F\bibinitperiod},
+           given={Hongfei},
+           giveni={H\bibinitperiod}}}%
+        {{hash=aaa0b4dbe6c33cff10ef5a938bea63c1}{%
+           family={Gao},
+           familyi={G\bibinitperiod},
+           given={Liping},
+           giveni={L\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Singapore}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{6e5eb0d3c7fc154659f7d1c14e441917}
+      \strng{fullhash}{69963c669ee8f379275049a09541052a}
+      \strng{fullhashraw}{69963c669ee8f379275049a09541052a}
+      \strng{bibnamehash}{69963c669ee8f379275049a09541052a}
+      \strng{authorbibnamehash}{69963c669ee8f379275049a09541052a}
+      \strng{authornamehash}{6e5eb0d3c7fc154659f7d1c14e441917}
+      \strng{authorfullhash}{69963c669ee8f379275049a09541052a}
+      \strng{authorfullhashraw}{69963c669ee8f379275049a09541052a}
+      \strng{editorbibnamehash}{5efeddaaca956d2586add9781e4a930a}
+      \strng{editornamehash}{30d48d0786c8020587dd22d8efbd38a4}
+      \strng{editorfullhash}{5efeddaaca956d2586add9781e4a930a}
+      \strng{editorfullhashraw}{5efeddaaca956d2586add9781e4a930a}
+      \field{sortinit}{J}
+      \field{sortinithash}{b2f54a9081ace9966a7cb9413811edb4}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{As open-source software (OSS) development is becoming a trend, an increasing number of businesses and developers are joining OSS projects. For project managers, developers and users, understanding the current health status of a project is very important to manage a development process, select the open-source projects to development or to adopt the software packages developed by projects. Therefore, an efficient approach to evaluate the health status of the open-source project is needed. Unfortunately, although many approaches including metrics have been proposed, they are designed in arbitrary ways. In this paper, a math ematical tool, i.e., factor analysis, is used to build a health evaluation model for OSS projects. As far as we know, this is the first time that factor analysis has been applied to evaluate OSS projects. This model is based on GitHub data and uses the basic indexes that are closely related to the health status of the projects as the input. Then, six new synthetic metrics, namely community activity, project popularity, development activity, completeness, responsiveness and persistence are obtained through factor analysis, which can be used to calculate the overall health score of a project. Moreover, in order to verify the effectiveness of this model, it is applied to some real projects and the results show that the overall scores achieved by this model can reflect the health status of the projects.}
+      \field{booktitle}{Computer {{Supported Cooperative Work}} and {{Social Computing}}}
+      \field{isbn}{978-981-15-1377-0}
+      \field{langid}{english}
+      \field{title}{The {{Metrics}} to {{Evaluate}} the {{Health Status}} of {{OSS Projects Based}} on {{Factor Analysis}}}
+      \field{year}{2019}
+      \field{pages}{723\bibrangedash 737}
+      \range{pages}{15}
+      \verb{doi}
+      \verb 10.1007/978-981-15-1377-0_56
+      \endverb
+      \keyw{Factor analysis,Health status,Open source software project}
+    \endentry
     \entry{kumarComprehensiveStudyImpact2024}{article}{}{}
       \name{author}{5}{}{%
         {{un=0,uniquepart=base,hash=b085a1aceac16f4a29d46cc9a93c7c5e}{%
@@ -3517,12 +3532,12 @@
     \endentry
     \entry{liOpenSourceHidden2025}{article}{}{}
       \name{author}{6}{}{%
-        {{un=1,uniquepart=given,hash=4d885d9c631dc108729002d3e4751cf2}{%
+        {{un=0,uniquepart=base,hash=4d885d9c631dc108729002d3e4751cf2}{%
            family={Li},
            familyi={L\bibinitperiod},
            given={Boyuan},
            giveni={B\bibinitperiod},
-           givenun=1}}%
+           givenun=0}}%
         {{un=0,uniquepart=base,hash=30b278deffb74289c6aea3469e1ac95e}{%
            family={Liu},
            familyi={L\bibinitperiod},
@@ -3566,6 +3581,7 @@
       \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
       \field{extradatescope}{labelyear}
       \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{shorttitle}
       \field{abstract}{Integrating third-party software components is a common practice in modern software development, offering significant advantages in terms of efficiency and innovation. However, this practice is fraught with risks related to software licensing. A lack of understanding may lead to disputes, which can pose serious legal and operational challenges. To these ends, both academia and industry have conducted various investigations and proposed solutions and tools to deal with these challenges. However, significant limitations still remain. Moreover, the rapid evolution of open-source software (OSS) licenses, as well as the rapidly incorporated generative software engineering techniques, such as large language models for code (CodeLLMs), are placing greater demands on the systematic management of software license risks. To unveil the severe challenges and explore possible future directions, we conduct the first systematic literature review (SLR) on 80 carefully selected OSS license-related papers, classifying existing research into three key categories, i.e., license identification, license risk assessment, and license risk mitigation. Based on these, we discuss challenges in existing solutions, conclude the opportunities to shed light on future research directions and offer practical recommendations for practitioners. We hope this thorough review will help bridge the gaps between academia and industry and accelerate the ecosystem-wide governance of legitimate software risks within the software engineering community.}
@@ -3590,69 +3606,6 @@
       \verb /Users/shayan/Zotero/storage/LE4TKUBF/Li et al. - 2025 - Open Source, Hidden Costs A Systematic Literature Review on OSS License Management.pdf;/Users/shayan/Zotero/storage/AAJAAL9J/11072183.html
       \endverb
       \keyw{Codes,Industries,Law,Legal factors,Licenses,Literature Review,Open source software,OSS,OSS license management,Search problems,Software,systematic literature review,Systematic literature review,Taxonomy}
-    \endentry
-    \entry{liExploringFactorsMetrics2022}{article}{}{}
-      \name{author}{4}{}{%
-        {{un=1,uniquepart=given,hash=a6b86154c32efdc6df26d990392dc07c}{%
-           family={Li},
-           familyi={L\bibinitperiod},
-           given={Xiaozhou},
-           giveni={X\bibinitperiod},
-           givenun=1}}%
-        {{un=0,uniquepart=base,hash=f34eee2215343558748e8080f6ea356d}{%
-           family={Moreschini},
-           familyi={M\bibinitperiod},
-           given={Sergio},
-           giveni={S\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=070032ef28f057f2f06b2a3879e3f70c}{%
-           family={Zhang},
-           familyi={Z\bibinitperiod},
-           given={Zheying},
-           giveni={Z\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=4d08ae1a3f71e9cc303d7cc0722f5186}{%
-           family={Taibi},
-           familyi={T\bibinitperiod},
-           given={Davide},
-           giveni={D\bibinitperiod},
-           givenun=0}}%
-      }
-      \strng{namehash}{359a3b687b8e4973ad0170a375289a33}
-      \strng{fullhash}{2c58c3963678a732864e0dc0995a2f7c}
-      \strng{fullhashraw}{2c58c3963678a732864e0dc0995a2f7c}
-      \strng{bibnamehash}{2c58c3963678a732864e0dc0995a2f7c}
-      \strng{authorbibnamehash}{2c58c3963678a732864e0dc0995a2f7c}
-      \strng{authornamehash}{359a3b687b8e4973ad0170a375289a33}
-      \strng{authorfullhash}{2c58c3963678a732864e0dc0995a2f7c}
-      \strng{authorfullhashraw}{2c58c3963678a732864e0dc0995a2f7c}
-      \field{sortinit}{L}
-      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{shorttitle}
-      \field{abstract}{Context: Open Source Software (OSS) is nowadays used and integrated in most of the commercial products. However, the selection of OSS projects for integration is not a simple process, mainly due to a of lack of clear selection models and lack of information from the OSS portals. Objective: We investigate the factors and metrics that practitioners currently consider when selecting OSS. We also investigate the source of information and portals that can be used to assess the factors, as well as the possibility to automatically extract such information with APIs. Method: We elicited the factors and the metrics adopted to assess and compare OSS performing a survey among 23 experienced developers who often integrate OSS in the software they develop. Moreover, we investigated the APIs of the portals adopted to assess OSS extracting information for the most starred 100K projects in GitHub. Result: We identified a set consisting of 8 main factors and 74 sub-factors, together with 170 related metrics that companies can use to select OSS to be integrated in their software projects. Unexpectedly, only a small part of the factors can be evaluated automatically, and out of 170 metrics, only 40 are available, of which only 22 returned information for all the 100K projects. Therefore, we recommend project maintainers and project repositories to pay attention to provide information for the project they are hosting, so as to increase the likelihood of being adopted. Conclusion: OSS selection can be partially automated, by extracting the information needed for the selection from portal APIs. OSS producers can benefit from our results by checking if they are providing all the information commonly required by potential adopters. Developers can benefit from our results, using the list of factors we selected as a checklist during the selection of OSS, or using the APIs we developed to automatically extract the data from OSS projects.}
-      \field{issn}{0164-1212}
-      \field{journaltitle}{Journal of Systems and Software}
-      \field{month}{6}
-      \field{shorttitle}{Exploring Factors and Metrics to Select Open Source Software Components for Integration}
-      \field{title}{Exploring Factors and Metrics to Select Open Source Software Components for Integration: {{An}} Empirical Study}
-      \field{urlday}{4}
-      \field{urlmonth}{5}
-      \field{urlyear}{2026}
-      \field{volume}{188}
-      \field{year}{2022}
-      \field{urldateera}{ce}
-      \field{pages}{111255}
-      \range{pages}{1}
-      \verb{doi}
-      \verb 10.1016/j.jss.2022.111255
-      \endverb
-      \verb{file}
-      \verb /Users/shayan/Zotero/storage/RVWUNNBM/Li et al. - 2022 - Exploring factors and metrics to select open source software components for integration An empirica.pdf;/Users/shayan/Zotero/storage/WEJL7CYQ/S0164121222000267.html
-      \endverb
-      \keyw{Github Metrics,Open source,Open source adoption,Software selection}
     \endentry
     \entry{LibrariesioSecurityMaintenance2026}{online}{}{}
       \list{organization}{1}{%
@@ -3683,70 +3636,6 @@
       \verb{url}
       \verb https://libraries.io
       \endverb
-    \endentry
-    \entry{linakerHowCharacterizeHealth2022}{article}{}{}
-      \name{author}{3}{}{%
-        {{un=0,uniquepart=base,hash=78845484a1e9b8f8c480077855155c68}{%
-           family={Lin{å}ker},
-           familyi={L\bibinitperiod},
-           given={Johan},
-           giveni={J\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=d69da57f7efda3a99a2a55ac0dc31f35}{%
-           family={Papatheocharous},
-           familyi={P\bibinitperiod},
-           given={Efi},
-           giveni={E\bibinitperiod},
-           givenun=0}}%
-        {{un=0,uniquepart=base,hash=6e820adc2747cef9f9a7b49079e412ee}{%
-           family={Olsson},
-           familyi={O\bibinitperiod},
-           given={Thomas},
-           giveni={T\bibinitperiod},
-           givenun=0}}%
-      }
-      \list{location}{1}{%
-        {New York, NY, USA}%
-      }
-      \list{publisher}{1}{%
-        {Association for Computing Machinery}%
-      }
-      \strng{namehash}{51148f59675ee08de56f5bb79c33d170}
-      \strng{fullhash}{66e7c9cb6b64ecb3fbc01cc699dbf396}
-      \strng{fullhashraw}{66e7c9cb6b64ecb3fbc01cc699dbf396}
-      \strng{bibnamehash}{66e7c9cb6b64ecb3fbc01cc699dbf396}
-      \strng{authorbibnamehash}{66e7c9cb6b64ecb3fbc01cc699dbf396}
-      \strng{authornamehash}{51148f59675ee08de56f5bb79c33d170}
-      \strng{authorfullhash}{66e7c9cb6b64ecb3fbc01cc699dbf396}
-      \strng{authorfullhashraw}{66e7c9cb6b64ecb3fbc01cc699dbf396}
-      \field{sortinit}{L}
-      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
-      \field{extradatescope}{labelyear}
-      \field{labeldatesource}{}
-      \true{uniqueprimaryauthor}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{shorttitle}
-      \field{abstract}{Motivation: Society's dependence on Open Source Software (OSS) and the communities that maintain the OSS is ever-growing. So are the potential risks of, e.g., vulnerabilities being introduced in projects not actively maintained. By assessing an OSS project's capability to stay viable and maintained over time without interruption or weakening, i.e., the OSS health, users can consider the risk implied by using the OSS as is, and if necessary, decide whether to help improve the health or choose another option. However, such assessment is complex as OSS health covers a wide range of sub-topics, and existing support is limited. Aim: We aim to create an overview of characteristics that affect the health of an OSS project and enable the assessment thereof. Method: We conduct a snowball literature review based on a start set of 9 papers, and identify 146 relevant papers over two iterations of forward and backward snowballing. Health characteristics are elicited and coded using structured and axial coding into a framework structure. Results: The final framework consists of 107 health characteristics divided among 15 themes. Characteristics address the socio-technical spectrum of the community of actors maintaining the OSS project, the software and other deliverables being maintained, and the orchestration facilitating the maintenance. Characteristics are further divided based on the level of abstraction they address, i.e., the OSS project-level specifically, or the project's overarching ecosystem of related OSS projects. Conclusion: The framework provides an overview of the wide span of health characteristics that may need to be considered when evaluating OSS health and can serve as a foundation both for research and practice.}
-      \field{isbn}{978-1-4503-9845-9}
-      \field{journaltitle}{Proceedings of the 18th {{International Symposium}} on {{Open Collaboration}}}
-      \field{month}{9}
-      \field{series}{{{OpenSym}} '22}
-      \field{shorttitle}{How to Characterize the Health of an {{Open Source Software}} Project?}
-      \field{title}{How to Characterize the Health of an {{Open Source Software}} Project? {{A}} Snowball Literature Review of an Emerging Practice}
-      \field{urlday}{4}
-      \field{urlmonth}{5}
-      \field{urlyear}{2026}
-      \field{year}{2022}
-      \field{urldateera}{ce}
-      \field{pages}{1\bibrangedash 12}
-      \range{pages}{12}
-      \verb{doi}
-      \verb 10.1145/3555051.3555067
-      \endverb
-      \verb{file}
-      \verb /Users/shayan/Zotero/storage/XA6AGSLW/Linåker et al. - 2022 - How to characterize the health of an Open Source Software project A snowball literature review of a.pdf
-      \endverb
-      \keyw{Github Metrics}
     \endentry
     \entry{liuDemystifyingVulnerabilityPropagation2022}{article}{}{}
       \name{author}{6}{}{%
@@ -4561,6 +4450,63 @@
       \verb{url}
       \verb https://deepstrike.io/blog/vulnerability-statistics-2025
       \endverb
+    \endentry
+    \entry{wangMethodEvaluateHealth2022}{article}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=8d5a708450d2bb3fcd442491beff9bc5}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Hongbing},
+           giveni={H\bibinitperiod},
+           givenun=0}}%
+        {{un=1,uniquepart=given,hash=af80cc92714f2d7d01040a19156916ef}{%
+           family={Wu},
+           familyi={W\bibinitperiod},
+           given={Zimin},
+           giveni={Z\bibinitperiod},
+           givenun=1}}%
+      }
+      \strng{namehash}{d7e96184547357720ad05c4f4e03151c}
+      \strng{fullhash}{d7e96184547357720ad05c4f4e03151c}
+      \strng{fullhashraw}{d7e96184547357720ad05c4f4e03151c}
+      \strng{bibnamehash}{d7e96184547357720ad05c4f4e03151c}
+      \strng{authorbibnamehash}{d7e96184547357720ad05c4f4e03151c}
+      \strng{authornamehash}{d7e96184547357720ad05c4f4e03151c}
+      \strng{authorfullhash}{d7e96184547357720ad05c4f4e03151c}
+      \strng{authorfullhashraw}{d7e96184547357720ad05c4f4e03151c}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{With the rapid development of open-source software (OSS), an increasing number of enterprises and developers have gradually joined OSS projects. OSS development has become a growing trend. For users, developers, and managers of OSS projects, understanding the health status of a project is conducive to making correct decisions and preventing the risks caused by a decline in the project's health. Therefore, an effective method is needed to evaluate the health of OSS projects. Based on the pressure state response (PSR) model, this paper propose a health evaluation model for OSS projects, defines t he healthof OSS projects from the three levels of pressure, state and response, and selects scientific, reasonable a nd representative indicators. The weight of each index is determined by the combination weighting method, which combines AHP and the entropy method. The health of the project is quantitatively analyzed, and the overall health score of a project is calculated. In addition, to verify the effectiveness of the proposed evaluation model, we conduct an empirical experiment based on real project data on the GitHub open-source platform. The experiment results and analysis show that our evaluation model can effectively reflect the health status of OSS projects.}
+      \field{eventtitle}{2022 {{IEEE}} 2nd {{International Conference}} on {{Software Engineering}} and {{Artificial Intelligence}} ({{SEAI}})}
+      \field{journaltitle}{2022 {{IEEE}} 2nd {{International Conference}} on {{Software Engineering}} and {{Artificial Intelligence}} ({{SEAI}})}
+      \field{month}{6}
+      \field{title}{A {{Method}} to {{Evaluate}} the {{Health}} of {{OSS Projects Based}} on the {{PSR Model}} and {{Combination Weighting}}}
+      \field{urlday}{11}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2022}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{109\bibrangedash 118}
+      \range{pages}{10}
+      \verb{doi}
+      \verb 10.1109/SEAI55746.2022.9832291
+      \endverb
+      \verb{file}
+      \verb /Users/shayan/Zotero/storage/AL6QK67A/Wang and Wu - 2022 - A Method to Evaluate the Health of OSS Projects Based on the PSR Model and Combination Weighting.pdf;/Users/shayan/Zotero/storage/IA7UU7JD/9832291.html
+      \endverb
+      \verb{urlraw}
+      \verb https://ieeexplore.ieee.org/document/9832291
+      \endverb
+      \verb{url}
+      \verb https://ieeexplore.ieee.org/document/9832291
+      \endverb
+      \keyw{Analytical models,Biological system modeling,combination weighting,Data models,Ecosystems,Entropy,health evaluation,Indexes,Market research,open-source software,PSR}
     \endentry
     \entry{weberPoliticalEconomyOpen2000}{article}{}{}
       \name{author}{1}{}{%

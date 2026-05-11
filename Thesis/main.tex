@@ -70,7 +70,7 @@ This thesis addresses that problem by developing an automated pipeline for detec
 
 The final analysis is based on a corpus of 699 Android APKs from sensitive categories such as finance, health, communication, and navigation. The results show that Android applications rely heavily on external libraries, with an average of 154.84 detected library occurrences per APK. However, 44.61\% of detected library occurrences were not cited in license declarations. The fingerprint-based method proved effective, confirming most library usage through code evidence and revealing dependencies that license information alone would miss.
 
-Overall, the thesis shows that the main risk is not simply the use of open-source libraries, but the gap between actual library usage and visible disclosure. The proposed pipeline provides a practical way to measure this gap and supports better dependency transparency in Android applications. In practical use, the pipeline can analyze a given APK and report which open-source libraries it contains and how fragile those libraries appear to be.
+Overall, the thesis shows that the main risk is not simply the use of open-source libraries, but the gap between actual library usage and visible disclosure. The proposed pipeline provides a practical way to measure this gap and supports better dependency transparency in Android applications. In practical use, the pipeline can analyze a given APK and report which open-source libraries it contains and how healthy those libraries appear to be.
 
 \chapter{Introduction}
 \section{Problem Statement}
@@ -80,7 +80,7 @@ Existing tools for detecting library usage inside APK files are limited. Therefo
 \section{Research Objectives and Scope}
 In this thesis, the terms \emph{external libraries}, \emph{open source libraries}, \emph{open source software (OSS)}, and \emph{libraries} refer to reusable third-party software components included in an Android application to provide specific functionality.
 
-The objective of this thesis is to develop an automated and scalable pipeline capable of extracting references to open source libraries from Android APK files. The research aims to build a dataset of commonly used applications, detect declared and undeclared library dependencies, and analyze the extent of these dependencies. Another goal is to evaluate how reliably library usage can be identified through license declarations, package fingerprints, and repository metadata, and to assess the feasibility of large-scale dependency analysis in mobile applications. The thesis also aims to identify applications with the highest intensity of uncited fragile open source library usage.
+The objective of this thesis is to develop an automated and scalable pipeline capable of extracting references to open source libraries from Android APK files. The research aims to build a dataset of commonly used applications, detect declared and undeclared library dependencies, and analyze the extent of these dependencies. Another goal is to evaluate how reliably library usage can be identified through license declarations, package fingerprints, and repository metadata, and to assess the feasibility of large-scale dependency analysis in mobile applications. The thesis also aims to identify applications with the highest intensity of uncited unhealthy open source library usage.
 
 The study is limited to Android APK files and does not cover iOS applications or other mobile platforms. It also does not validate decoded APK evidence against the original application source code, because that source code is generally unavailable. Finally, the thesis does not audit applications at runtime; library usage is evaluated through static evidence extracted from decoded APKs.
 
@@ -90,18 +90,18 @@ The research is guided by the following questions:
 \item (RQ1) Is it feasible to detect external libraries in Android APK files?
 \item (RQ2) How reliable are license declarations and package fingerprints for identifying library dependencies?
 \item (RQ3) How many open source libraries, and what types of them, are used in a sample of Android applications?
-\item (RQ4) Which Android applications show the highest dependency on fragile open source libraries?
+\item (RQ4) Which Android applications show the highest dependency on low-health or medium-health open-source libraries?
 \end{itemize}
 
 \section{Structure of the Thesis}
-We first review open-source dependency risks in Android software, focusing on prior work about Android third-party library detection, software supply-chain security, and open-source license management. We then move to the pipeline I developed to collect APKs, extract library evidence, and build the dataset. Finally, the generated dataset is analyzed to compare detected library usage with license disclosure and to identify applications with higher uncited fragile-library exposure.
+We first review open-source dependency risks in Android software, focusing on prior work about Android third-party library detection, software supply-chain security, and open-source license management. We then move to the pipeline I developed to collect APKs, extract library evidence, and build the dataset. Finally, the generated dataset is analyzed to compare detected library usage with license disclosure and to identify applications with higher uncited unhealthy-library exposure.
 
 \section{Personal Motivation and Acknowledgements}
 I chose this topic because I enjoy technical challenges. Detecting dependencies from the source code of Android applications would be relatively straightforward, but APK files are compiled final products where the original project structure is no longer directly visible. This makes dependency detection more difficult and makes the problem more interesting from both a technical and research perspective.
 
 I would like to thank my supervisor, Dr. Johannes Wachs, for involving me in this research topic and for his guidance, support, and enthusiasm throughout the work.
 
-Also, I would like to thank my wife, Shahrzad Pourjafargholi to support me in this journey.
+Also, I would like to thank my wife, Shahrzad to support me in this journey.
 
 \chapter{Theoretical Background}
 \section{Modern Software Development and Dependency Ecosystem}
@@ -292,12 +292,18 @@ To improve detection accuracy, a database of library fingerprints is created fro
 \section{Data Aggregation and Analysis}
 For each processed application, detected libraries and related metadata are stored in structured files and combined into a single dataset. The dataset is then analyzed to understand frequency, and differences between declared and detected dependencies. The purpose of the analysis is to obtain insights about dependency usage in real Android applications rather than to evaluate application functionality.
 
-\section{Repository Metadata and Metrics}
+\section{Repository Metadata and Health Metric}
 
-After library detection, the study enriches the dataset with GitHub repository metadata for detected open-source libraries. These metadata are later used to construct three repository-level metrics: popularity, activity, and fragility. These metrics provide additional context beyond simple library presence and support the later analysis of which APKs depend on libraries with higher fragility.
+After library detection, the study enriches the dataset with GitHub repository data for detected open-source libraries. The repository-level analysis uses the health-score method proposed by \textcite{wangMethodEvaluateHealth2022}. This method produces a single repository health score based on 12 indicators grouped into pressure, state, and response layers. The resulting score is then converted into repository health levels: low, medium, and high. These health scores and levels provide context beyond simple library presence and support the later analysis of which APKs depend on libraries whose upstream repositories are not classified as high health.
 
 \section{Methodological Limitations}
-The method has several limitations. The APK corpus is limited by hardware resources. The pipeline is designed to work on local device. As a result hardware limitation is inevitable. The corpus is not category-balanced. The analysis is static, so it detects embedded code evidence but does not prove runtime execution. The method also assume on successful APK decoding, partial available license evidence, and availability of public repository URLs; missing or obfuscated information can reduce detection coverage.
+The method has several limitations. The APK corpus is limited by hardware resources because the pipeline is designed to run on a local device; therefore, decoding, indexing, matching, and repository processing could not be scaled without practical runtime and storage constraints. The corpus is also not category-balanced, so the findings should not be interpreted as representing all Google Play categories equally.
+
+The analysis is static, meaning that it detects embedded code evidence in decoded APK files but does not prove runtime execution of a library. The method also depends on successful APK decoding, available license evidence, and public repository URLs. If an APK cannot be decoded fully, or if repository information is missing from license files, some libraries cannot be linked to upstream repositories or assigned a health score.
+
+A particularly important false-negative risk comes from code obfuscation and shrinking tools used in Android development, such as ProGuard, R8, DexGuard, or similar commercial protectors. These tools can rename packages, classes, methods, and fields; remove unused code; inline or merge classes; encrypt strings; and restructure bytecode. Because the fingerprint-matching method relies mainly on recognizable package prefixes, class paths, and import/export evidence, strong obfuscation can hide or distort the identifiers needed to match an APK class back to its original open-source library. As a result, a library may be present in the APK but remain undetected by the pipeline.
+
+Finally \texttt{apktool} is the decoding tool used to inspect APK contents in human readable format. It adds another limitation, because some code may remain in binary form or appear with transformed identifiers, reducing the effectiveness of static fingerprint matching.
 
 \chapter{System Design and Pipeline}
 
@@ -474,134 +480,203 @@ MEDICAL & 56 \\
 \end{tabular}
 \end{table}
 
-\section{GitHub-Based Open Source Library Metrics}
-After analyzing APK-level metrics, we now move to repository-level evaluation using GitHub metadata. In this section, we will see how three composite metrics are constructed: popularity, activity, and fragility. These metrics are computed before integrating GitHub data with the APK dataset, so the focus here is on how they are calculated rather than on their final values.
+\section{GitHub-Based Repository Health Score}
 
-Previous studies show that GitHub metadata such as stars, forks, watchers/subscribers, commits, update recency, issues, repository age, and licensing information are frequently used to evaluate repository visibility, maintenance, adoption suitability, and project health.
+After analyzing APK-level metrics, the we to repository-level evaluation using GitHub data. Prior studies show that open-source project health cannot be evaluated from a single raw repository attribute. \parencite{diruscioOSSMETERSoftwareMeasurement2015} present OSSMETER as a platform for automatically analysing OSS projects across multiple information sources, including source-code repositories, communication channels, and issue trackers. Their work is relevant because it frames OSS assessment as a multi-source measurement problem covering quality, maturity, development activity, and user support rather than only repository popularity.
 
-\subsection{Library Popularity}
-Library popularity measures how widely a repository appears both in the APK corpus and on GitHub. The metric combines corpus-derived usage indicators with GitHub visibility indicators. The APK-level indicators include \texttt{library\_occurrences} and \texttt{apk\_count}, while GitHub indicators include \texttt{stars\_count}, \texttt{forks\_count}, and \texttt{subscribers\_count}.
+A more direct health-score approach is proposed by \parencite{jiangMetricsEvaluateHealth2019}, who use GitHub data and factor analysis to evaluate OSS project health. Their model transforms basic repository indexes into six synthetic health-related metrics: community activity, project popularity, development activity, completeness, responsiveness, and persistence. This is important for the present thesis because it shows that repository health can be represented through combined indicators derived from project activity and community behavior.
 
-This design follows prior work that treats GitHub stars, forks, and watchers/subscribers as signals of repository popularity and social attention. \textcite{borgesUnderstandingFactorsThat2016} describe GitHub stars as an explicit way for users to express interest or satisfaction with a repository and study stars as a proxy for repository popularity. In addition, open source component-selection research shows that practitioners consider popularity, community adoption, and repository metadata when deciding whether to integrate an open-source component \parencite{liExploringFactorsMetrics2022}. Based on this literature, the popularity score in this thesis combines GitHub visibility with direct evidence of how often a library appears in the analyzed APK corpus.
+Building on this line of work, \parencite{wangMethodEvaluateHealth2022} provide the most suitable model for this thesis because they define an explicit OSS project health score, organize the indicators into the pressure--state--response model, and report final weights for the selected factors. Therefore, this thesis adopts the Wang and Wu health-score method as the repository-level metric used for the detected GitHub libraries.
+
+\subsection{Adopted Health-Score Model}
+
+\textcite{wangMethodEvaluateHealth2022} propose a method for evaluating the health of open-source software projects based on the pressure--state--response (PSR) model. Their model divides repository health into three categories: pressure, state, and response. Across these categories, they define 12 factors (see Table~\ref{tab:wang2022-health-factors}). The full explanation of the Wang and Wu model, including its theoretical background and data-collection logic, will be provided in Appendix~\ref{app:wang2022-health-model}.
+
+Table~\ref{tab:wang2022-health-factors} summarizes the 12 factors adopted in this thesis. The impact column indicates whether a larger value improves the health score (+) or reduces it (-). The weights are the final combined weights reported by Wang and Wu after combining AHP and entropy weighting.
+
+\begin{table}[htbp]
+\centering
+\caption{Repository health factors adopted from Wang and Wu's OSS health model}
+\label{tab:wang2022-health-factors}
+\begin{tabular}{llcr}
+\hline
+\textbf{Factor title} & \textbf{Category} & \textbf{Impact} & \textbf{Weight} \\
+\hline
+Number of watches & Pressure & + & 0.0901 \\
+Number of forks & Pressure & + & 0.1519 \\
+Number of languages & Pressure & - & 0.2291 \\
+Number of bugs & Pressure & - & 0.5285 \\
+Number of contributors & State & + & 0.3147 \\
+Number of commits & State & + & 0.1304 \\
+Number of comments & State & + & 0.0676 \\
+Number of issues & State & + & 0.4871 \\
+Number of pull requests & Response & + & 0.0559 \\
+Pull requests merged & Response & + & 0.3525 \\
+Issue close/open ratio & Response & + & 0.4261 \\
+Issue close time & Response & - & 0.1650 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Application to Repositories Detected in the APK Corpus}
+
+I adopted Wang and Wu method for the GitHub repositories identified through the APK-library detection pipeline. Starting from the repository URLs extracted from the final APK dataset, the pipeline collects repository-level information using the GitHub API and, where necessary, local cloned repositories. The APK corpus contains 274 unique GitHub repository URLs. The health-score data collection successfully gathered the required indicators for 220 repositories, while 54 repositories were excluded or marked incomplete because of missing data, unavailable repositories, API errors, or incompatible repository structure (reflected as nan in Figure~\ref{fig:github-wang2022-health-level-distribution}).
+
+For each repository, the 12 factors are normalized before the layer scores are calculated. This step is necessary because the factors use different scales. For example, forks, commits, and comments are count variables, while issue close time is measured in days. Following Wang and Wu, positive factors are normalized as:
 
 \begin{equation}
-\begin{split}
-Popularity = & \,0.30 \times norm(library\_occurrences) \\
-& + 0.25 \times norm(apk\_count) \\
-& + 0.20 \times norm(log(1 + stars)) \\
-& + 0.15 \times norm(log(1 + forks)) \\
-& + 0.10 \times norm(log(1 + subscribers))
-\end{split}
+ a'_i = \frac{a_i - \min(a)}{\max(a) - \min(a)}
 \end{equation}
 
-Here, \texttt{norm()} scales indicators to a comparable range, while \texttt{log(1 + x)} reduces the effect of very large GitHub counts and keeps zero values valid. The higher weights assigned to \texttt{library\_occurrences} and \texttt{apk\_count} emphasize observed use in the APK corpus, while the GitHub indicators capture broader ecosystem visibility. The resulting popularity ranking for repositories detected in the APK corpus is shown in Figure~\ref{fig:github-popularity-score}.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.7\textwidth,keepaspectratio]{image/top_repositories_by_popularity_score.png}
-\caption{Top 10 repositories by popularity score in the APK corpus}
-\label{fig:github-popularity-score}
-\end{figure}
-
-\subsection{Repository Activity Metrics}
-Repository activity estimates how actively a project is maintained. The metric is based on temporal and structural indicators, including \texttt{days\_since\_push}, \texttt{days\_since\_update}, \texttt{repo\_age\_days}, and \texttt{forks\_count}.
-
-The activity metric is derived from research on open source library maintenance and project health. \textcite{coelhoThisGitHubProject2020} argue that users need indicators of whether a GitHub project is maintained and propose measuring maintenance activity using repository data such as commits, issues, pull requests, forks, and activity history. Similarly, \textcite{linakerHowCharacterizeHealth2022} define open source library health as the capability of a project to remain viable and maintained over time, and identify technical activity as an important dimension of project health. Therefore, recent push and update activity are treated as the strongest activity signals in this thesis.
-
-Recent activity is treated as a positive signal. Therefore, the metrics for time since last push and update are inversely normalized, meaning that smaller values produce higher scores. Repository age and forks are included with smaller weights as indicators of maturity and community engagement.
+Negative factors are normalized in the opposite direction:
 
 \begin{equation}
-\begin{split}
-Activity = & \,0.45 \times norm^{-1}(days\_since\_push) \\
-& + 0.35 \times norm^{-1}(days\_since\_update) \\
-& + 0.10 \times norm(log(1 + repo\_age\_days)) \\
-& + 0.10 \times norm(log(1 + forks))
-\end{split}
+ a'_i = \frac{\max(a) - a_i}{\max(a) - \min(a)}
 \end{equation}
 
-Here, \texttt{norm()\textsuperscript{-1}} reverses the normalized scale, so smaller values such as fewer days since the last push or update produce higher activity scores. The weighting emphasizes maintenance recency because recently pushed or updated repositories are more likely to be actively maintained than repositories with long periods of inactivity. The repository activity ranking for libraries detected in the APK corpus is shown in Figure~\ref{fig:github-activity-score}.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.7\textwidth,keepaspectratio]{image/top_repositories_by_activity_score.png}
-\caption{Top 10 repositories by activity score in the APK corpus}
-\label{fig:github-activity-score}
-\end{figure}
-
-\subsection{Fragility Metrics}
-Fragility estimates potential maintenance or governance risk in a repository. A higher score indicates that a library may be less stable or more risky as a dependency.
-
-The fragility metric is derived from literature on open source library health, maintenance risk, and component selection. \textcite{coelhoThisGitHubProject2020} explicitly link maintenance activity to the risk of depending on unmaintained GitHub projects. \textcite{liExploringFactorsMetrics2022} also identify factors such as license, community activity, issue management, and project characteristics as relevant when selecting open source library components for integration. In this thesis, fragility is therefore modeled as a risk-oriented repository health indicator.
-
-The metric combines several signals: repository state, maintenance recency, issue volume, popularity, and license availability. Archived and disabled states are treated as strong indicators of fragility because they directly indicate that the repository may no longer be normally maintained or available for development. Delayed updates and large issue counts are treated as moderate risk signals. Low popularity is included as a smaller risk factor because less visible projects may have a smaller user and maintainer base, although popularity alone does not guarantee quality or safety. Missing license information is also included because license clarity is an important factor in open source library selection and governance \parencite{liExploringFactorsMetrics2022,linakerHowCharacterizeHealth2022}.
+This means that higher normalized values always represent better health. For example, the minimum number of forks in the repository dataset is 0 and the maximum is 78,914, in \textit{BoltsFramework/Bolts-Android} with 535 forks receives the normalized positive value:
 
 \begin{equation}
-\begin{split}
-Fragility = & \,0.25 \times archived \\
-& + 0.20 \times disabled \\
-& + 0.20 \times norm(days\_since\_push) \\
-& + 0.15 \times norm(days\_since\_update) \\
-& + 0.10 \times norm(log(1 + open\_issues)) \\
-& + 0.05 \times norm^{-1}(log(1 + stars)) \\
-& + 0.05 \times missing\_license
-\end{split}
+ \frac{535 - 0}{78914 - 0} = 0.0068
 \end{equation}
 
-The resulting values are categorized into three levels for interpretability: low, medium, and high fragility. These categories are not intended to label a repository as unsafe by themselves. Instead, they provide a relative ranking that helps identify repositories and APKs that may require closer manual review. The fragility ranking for repositories detected in the APK corpus is shown in Figure~\ref{fig:github-fragility-score}.
+In contrast, issue close time is treated as a negative factor, and the minimum close time is 0.01 day while the maximum is 2621 days, in \textit{BoltsFramework/Bolts-Android} with an average close time of 55.24 days receives:
+
+\begin{equation}
+ \frac{2621 - 55.24}{2621 - 0.01} = 0.9789
+\end{equation}
+
+After normalization, the pressure, state, and response scores are calculated as weighted sums of their respective factors. The final repository health score is then calculated as the average of the three layer scores multiplied by 100:
+
+\begin{equation}
+ H = \left(\frac{H_P + H_S + H_R}{3}\right) \times 100
+\end{equation}
+
+\subsection{Repository Health-Score Results}
+
+The resulting health score provides a single value for each repository, where a higher score indicates a healthier repository. Figure~\ref{fig:github-wang2022-top-healthiest} shows the top 10 healthiest repositories in the APK corpus.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.7\textwidth,keepaspectratio]{image/top_repositories_by_fragility_score.png}
-\caption{Top 10 repositories by fragility score in the APK corpus}
-\label{fig:github-fragility-score}
+\includegraphics[width=0.75\textwidth,keepaspectratio]{image/top_repositories_by_health_score.png}
+\caption{Top 10 repositories health score in the APK corpus}
+\label{fig:github-wang2022-top-healthiest}
 \end{figure}
 
-The distribution of fragility levels is shown in Figure~\ref{fig:github-fragility-distribution}. Most repositories fall into the low-fragility category (251 repositories), while a smaller group is classified as medium fragility (23 repositories). No repository in the analyzed corpus is classified as high fragility.
+Wang and Wu divide repository health scores into three levels: low health in the interval [0, 10), medium health in the interval [10, 30), and high health in the interval [30, 100]. This thesis adopts the same thresholds so that the resulting repository categories remain consistent with the source model. In the analyzed GitHub repository set, no repository falls into the low-health category, 16 repositories fall into the medium-health category, and 204 repositories fall into the high-health category. Figure~\ref{fig:github-wang2022-health-level-distribution} shows the distribution of repositories across these health levels in the APK corpus.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.7\textwidth,keepaspectratio]{image/repository_count_by_fragility_level.png}
-\caption{Distribution of repositories across fragility levels in the APK corpus}
-\label{fig:github-fragility-distribution}
+\includegraphics[width=0.7\textwidth,keepaspectratio]{image/repository_count_by_health_level.png}
+\caption{Distribution of repositories across health levels in the APK corpus}
+\label{fig:github-wang2022-health-level-distribution}
+{\footnotesize\textit{Note.} The \texttt{nan} category represents repositories that were excluded or marked incomplete because of missing data, unavailable repositories, GitHub API errors, or incompatible repository structure.}
 \end{figure}
 
-\subsection{Metric Relationships}
-The three metrics capture different dimensions of repository characteristics and should be interpreted together. Figure~\ref{fig:popularity-vs-fragility-vs-activity} compares popularity and activity scores, with fragility level shown by color. The median popularity and activity lines divide the plot into four interpretive quadrants. The main observation is that activity appears to be a stronger indicator of fragility than popularity: above the median activity line, only a very small number of medium-fragility repositories appear. The low-activity and high-popularity quadrant is also almost empty, meaning that repositories with below-median activity are generally not among the most popular repositories in this corpus.
-
-This pattern suggests that activity and lower fragility may partially reinforce each other. Active repositories are more likely to receive maintenance attention from other developers, which can reduce fragility over time. In contrast, stars and subscribers mainly indicate visibility or interest; no matter how popular a repository becomes, recent commits and updates appear to have a stronger relationship with fragility in this corpus.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth,keepaspectratio]{image/popularity_vs_activity_fragility.png}
-\caption{Relationship between popularity, activity, and fragility level}
-\label{fig:popularity-vs-fragility-vs-activity}
-\end{figure}
+The repository-level health data will later be joined back to the APK-library evidence dataset. This makes it possible for us to estimate which APKs depend on medium-health libraries and how intense those libraries appear in each APK. The APK-level interpretation of this joined dataset is discussed later in Subsection~\ref{sec:medium-health-level-open-source-library-usage-in-apks}.
 
 
 \chapter{Validation}
 
 \section{Validation Strategy}
-At this point, the pipeline has identified the open-source libraries used in each analyzed APK. The validation question is whether there is any chance to see these libraries as a list inside the application itself. If an app provides an in-app open-source license page, then the pipeline findings can be qualitatively compared with that visible declaration. Therefore, a small-scale manual validation was conducted to check whether the detected library declarations are visible to end users inside Android applications.
+At this point, the pipeline has identified open-source libraries used in each analyzed APK through license extraction and fingerprint matching. The main validation question is whether these detected libraries can be compared against an independent baseline. Initially, the planned validation approach was to inspect applications manually and compare the pipeline output with the list of open-source libraries disclosed inside the application itself. This would have provided a direct user-visible validation source if applications exposed their dependency declarations through an in-app license screen.
 
-\section{Sample Selection}
-The validation sample consists of 27 applications selected using the following criteria:
+However, this first validation strategy was not successful as a general baseline. A sample of 27 commercial applications (Appendix Table~\ref{tab:list-apps-manual-validation}) was installed and explored manually in the Android Studio Emulator, including settings menus, about pages, help pages, and other sections where open-source notices are typically located. Almost none of the selected applications provided an accessible in-app list of open-source libraries. The only clear exception was \textit{BudapestGO}, where the in-app license screen matched the libraries detected by the pipeline (Appendix Table~\ref{tab:budapestgo-summary-report}). This result was useful as a qualitative example, but it was not sufficient for estimating accuracy, precision, recall, or false positives across the pipeline.
+
+For this reason, a second validation approach was introduced using open-source Android applications from F-Droid. The motivation was to create a control set where the APK can be analyzed by the fingerprinting pipeline, while the corresponding public source-code repository can be inspected independently. In this setting, the source-code analysis is treated as an approximate ground truth because dependencies may be declared in Gradle files, version catalogs, third-party documentation, vendor directories, or repository references. The validation therefore compares two independent sources of evidence for the same applications: libraries detected from the compiled APK and libraries reconstructed from the public source code.
+
+\section{Open-Source Control Set}
+The validation control set consists of 100 F-Droid applications. These applications were selected from the F-Droid dataset under three conditions. First, the package name had to exist in the main APK input dataset (AndroZoo). Second, the application had to belong to one of the research categories used in the main corpus. Third, the F-Droid metadata had to contain a GitHub source-code URL. This ensured that each selected application had both an APK representation for pipeline analysis and a source-code repository for independent comparison.
+
+The APK analysis pipeline was then executed separately for these 100 F-Droid applications. For this validation run, the fingerprint database was not limited to fingerprints generated from the F-Droid repositories alone. Instead, it combined the fingerprints already gathered from the main 699-APK corpus with the additional fingerprints generated from the 100 F-Droid APKs and their related source-code evidence. This design made the validation run closer to the real pipeline setting, because the APKs were analyzed against the accumulated fingerprint knowledge available in the project rather than against an isolated minimal fingerprint set.
+
+The resulting APK-side validation dataset contains \textbf{15,353 library occurrence rows} across exactly \textbf{100 APK packages}. These rows correspond to \textbf{202 unique open-source libraries} when grouped by \texttt{repo\_url}, and none of the rows has a missing repository URL. This means that the validation subset is suitable for repository-level comparison because all detected library occurrences can be linked to a normalized repository identifier. The average number of detected library occurrences is \textbf{153.53 per APK} (Figure~\ref{fig:library-occurrences-per-apk-fdroid}), which is very close to the main 699-APK corpus average.
+
+The citation pattern in the validation subset also shows that license disclosure remains incomplete even among open-source applications: approximately \textbf{68.55\%} of detected library occurrences are cited, while \textbf{31.45\%} are not cited. Among the cited rows, approximately \textbf{95.90\%} are also found by fingerprint evidence, while \textbf{38.13\%} are found through license-exposure evidence. This indicates that even in the F-Droid validation subset, fingerprint-based evidence remains the dominant confirmation mechanism, while direct license exposure captures only part of the dependency evidence.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.7\textwidth,keepaspectratio]{image/library_occurrences_per_apk_boxplot_fdroid.png}
+\caption{Distribution of detected library occurrences per APK in the F-Droid validation set}
+\label{fig:library-occurrences-per-apk-fdroid}
+\end{figure}
+
+\section{Source-Code Library Extraction Methods}
+The source-code validation step uses an extendable detector structure. Each method scans the cloned repository in a different way and contributes candidate library declarations. At this stage, five source-code detection methods are used:
+
+\begin{enumerate}
+\item \textbf{Gradle dependency detection}: scans \texttt{build.gradle} and \texttt{build.gradle.kts} files for dependency declarations such as \texttt{implementation}, \texttt{api}, \texttt{compileOnly}, \texttt{runtimeOnly}, \texttt{kapt}, and test-related configurations.
+\item \textbf{Version catalog detection}: scans \texttt{libs.versions.toml} files and extracts entries from the \texttt{[libraries]} section.
+\item \textbf{Third-party markup detection}: scans documentation files in directories such as \texttt{thirdparty}, \texttt{third\_party}, and \texttt{vendor}, including cases where libraries are listed in markup notes (README and LICENSE).
+\item \textbf{Vendor directory detection}: scans common bundled-library directories such as \texttt{thirdparty}, \texttt{third\_party}, \texttt{vendor}, \texttt{external}, and \texttt{libs}, and records subdirectories as possible embedded libraries.
+\item \textbf{GitHub URL detection}: scans text-like files across the repository for GitHub repository URLs and records them as candidate third-party libraries. Links pointing to the application repository itself are excluded so that internal project references are not counted as external libraries.
+\end{enumerate}
+
+\section{Matching APK Findings Against Source-Code Findings}
+The matching process uses \texttt{pkg\_name} as the first-level identifier. This means that a library detected in an APK is only compared with source-code libraries extracted from the corresponding application's repository. Within each package, the second-level matching uses multiple identifiers: \texttt{library\_key}, \texttt{library\_name}, Gradle coordinates, repository path, repository URL, and extracted GitHub URLs.
+
+Because the APK-derived dataset and source-code-derived dataset do not always describe the same library in the same format, exact matching alone would be too strict. Therefore, the comparison uses several partial matching methods:
+
+\begin{enumerate}
+\item \textbf{Repository URL matching}: compares normalized repository URLs and repository paths, including partial matches such as \texttt{owner/repo} appearing inside a longer URL.
+\item \textbf{Namespace matching}: checks whether one normalized library key or library name appears inside the other. For example, \texttt{okhttp} may match \texttt{com.squareup.okhttp3:okhttp}.
+\item \textbf{Artifact matching}: extracts the artifact part from Gradle coordinates or repository paths and compares this shorter identifier.
+\end{enumerate}
+
+\section{Validation Results on the F-Droid Control Set}
+The validation produced the following matching results for the 100 F-Droid applications:
+
 \begin{itemize}
-\item Applications in the corpus with more than 10 million installations
-\item The application \textit{BudapestGO}, included due to frequent usage by author.
-\item The top 5 APKs with the highest medium-fragility library usage intensity (as defined in later analysis)
+\item Matched source-code rows: \textbf{2,741}
+\item Matched APK rows: \textbf{11,740}
+\item Total match relationships: \textbf{106,197}
 \end{itemize}
-The full list of apps in manual validation are provided in Appendix Table~\ref{tab:list-apps-manual-validation}.
 
-\section{Manual Verification}
-All selected applications were installed and tested using the Android Studio Emulator. Each application was explored manually, including settings menus, about pages, and other sections where license disclosures are typically located.
+The match relationships were distributed across the matching methods as follows:
 
-The inspection showed that almost none of the applications provide in-app declarations of open-source libraries. The only exception was \textit{BudapestGO}, where the in-app license information fully matched the libraries detected by the pipeline. A screenshot of the BudapestGO license screen is provided in Appendix Figure~\ref{fig:budapestgo-screenshot-licenses}.
+\begin{table}[htbp]
+\centering
+\caption{Distribution of match types in the F-Droid validation set}
+\label{tab:fdroid-validation-match-types}
+\begin{tabular}{lr}
+\hline
+\textbf{Match type} & \textbf{Number of match relationships} \\
+\hline
+Contains match & 63,810 \\
+Artifact match & 28,108 \\
+Repository URL match & 14,279 \\
+\hline
+\textbf{Total} & \textbf{106,197} \\
+\hline
+\end{tabular}
+\end{table}
 
-\section{Accuracy Evaluation}
-A quantitative accuracy evaluation is not meaningful in this context. Only one application in the sample provided visible license declarations.
+Using the source-code analysis as the approximate ground truth, the APK analysis achieved the following validation metrics:
+
+\begin{table}[htbp]
+\centering
+\caption{Validation metrics using source-code analysis as approximate ground truth}
+\label{tab:fdroid-validation-accuracy}
+\begin{tabular}{lr}
+\hline
+\textbf{Metric} & \textbf{Value} \\
+\hline
+True positive matched source rows & 2,741 \\
+False negative source rows missed by APK analysis & 3,738 \\
+False positive APK rows not supported by source analysis & 3,613 \\
+Recall / ground-truth coverage & 42.31\% \\
+Precision / APK supported by source & 43.14\% \\
+F1 score & 42.72\% \\
+\hline
+\end{tabular}
+\end{table}
+
+These results show that the validation baseline is more informative than the original manual in-app emulator inspection. The recall value indicates that the APK pipeline identifies a meaningful portion of source-code-derived dependency evidence, but also misses a substantial number of libraries visible in the source-code analysis. The precision value shows that many APK-detected rows are not directly confirmed by the current source-code extraction method. This does not automatically mean that all of these rows are false positives. Source-code dependency extraction is itself incomplete and may miss generated dependencies, bundled code, build-time transformations, or libraries introduced through external build logic. In addition, part of the 3,613 APK rows not confirmed by source-code evidence may represent transitive dependencies present in the compiled APK rather than explicitly declared direct dependencies in the scanned source-code files.
 
 \section{Limitations of Validation}
-The validation is limited by the small and imbalanced sample size, because most selected applications come from high-installation or medium-fragility cases rather than from a category-balanced validation set. It is also limited by the lack of in-app license disclosures in most applications.
+The validation should be interpreted as an approximate baseline rather than a perfect ground truth. Source code provides stronger evidence than in-app license screens, but static source-code scanning may still miss conditional dependencies, build variants, aliases, generated code, bundled binaries, and dependencies introduced through external build logic. Conversely, the compiled APK may contain libraries that are not clearly visible in the scanned source branch, including transitive dependencies or build-time additions.
+
+The matching logic is intentionally permissive because APK evidence and source-code declarations often use different identifiers. Partial matching improves coverage, but it can also introduce false matches. A more exact validation would require opening each project in Android Studio and manually inspecting the full build configuration and codebase. Increasing the corpus size and fingerprint database may also change the accuracy in both directions: it can improve detection by discovering more libraries, but it can also introduce more transitive APK libraries that are difficult to match back to explicit source-code declarations. Therefore, the validation results should be read as a practical performance baseline for the current pipeline, not as a final measurement of absolute correctness.
 
 
 \chapter{Results and Discussion}
@@ -648,46 +723,43 @@ The distribution of libraries per application shows high variability. As shown i
 
 The APK-level results show that dependency usage in Android applications is both extensive and partially hidden.
 
-\subsection{Medium-Fragility Open Source Library Usage in APKs}
-After the APK-level analysis, the repository-level fragility metrics were joined back to the APK/library evidence dataset. This makes it possible to identify which applications use libraries classified as having \textit{Medium} fragility and to measure how intensely those libraries appear inside each APK. In this analysis, usage intensity is measured through \texttt{classes\_matched}, which is used as a proxy for how strongly a detected library appears in the decoded APK codebase.
+\subsection{Medium-Health Level Open Source Library Usage in APKs}\label{sec:medium-health-level-open-source-library-usage-in-apks}
+After the APK-level analysis, the repository-level Wang and Wu health scores were joined back to the APK/library evidence dataset. This makes it possible to identify which applications use libraries classified as having \textit{medium} repository health and to measure how intensely those libraries appear inside each APK. In this analysis, usage intensity is measured through \texttt{classes\_matched}, which is used as a proxy for how strongly a detected library appears in the decoded APK codebase.
 
-Across the largest analyzed corpus, the dataset contains \textbf{108,234} APK/library evidence rows. Of these, \textbf{106,368} rows could be joined to a GitHub repository with an assigned fragility level. Within this joined dataset, \textbf{739} rows correspond to libraries classified as \textit{Medium} fragility. These medium-fragility rows appear at least one time in \textbf{516} distinct APKs. This means that medium-fragility libraries are not limited to isolated cases; they appear across a meaningful subset of the analyzed application corpus size of \textbf{699}.
+Across the largest analyzed corpus, the dataset contains \textbf{108,234} APK/library evidence rows. Of these, \textbf{98,330} rows could be joined to a GitHub repository with an assigned health level. Within this joined dataset, \textbf{225} rows correspond to libraries classified as \textit{medium health}. These medium-health rows appear at least one time in \textbf{89} distinct APKs. This means that medium-health libraries are not limited to isolated cases; they appear across a \textbf{12.7\%} of the analyzed application corpus size.
 
-\subsubsection{How intense is Medium-fragility library use inside each APK?}
-The intensity of medium-fragility usage is calculated as the share of class matches associated with medium-fragility libraries relative to all detected open-source class matches in the same APK:
+\subsubsection{How intense is medium-health library use inside each APK?}
+The intensity of medium-health library usage is calculated as the share of class matches associated with medium-health libraries relative to all detected open-source class matches in the same APK:
 
 \begin{equation}
-MediumFragilityIntensity = \frac{medium\_fragility\_classes\_matched}{apk\_total\_classes\_matched} \times 100
+MediumHealthIntensity = \frac{medium\_health\_classes\_matched}{apk\_total\_classes\_matched} \times 100
 \end{equation}
 
-This measure does not claim to represent runtime execution frequency. Instead, it captures how much of the detected open-source code evidence inside an APK is associated with medium-fragility repositories. Applications with high values should therefore be interpreted as having stronger structural exposure to libraries with medium fragility.
+This measure does not claim to represent runtime execution frequency. Instead, it captures how much of the detected open-source code evidence inside an APK is associated with repositories classified as medium health. Applications with high values should therefore be interpreted as having stronger structural exposure to medium-health libraries.
 
-\subsubsection{Which APKs use open source libraries with Medium fragility?}
-The first question is which APKs contain at least one open-source library classified as \textit{Medium} fragility. The analysis identifies \textbf{516} such APKs. For each APK, the aggregation records the number of medium-fragility evidence rows, the number of unique medium-fragility repositories, the number of matched classes associated with these libraries, and the percentage of the APK's total detected open-source class matches represented by medium-fragility libraries.
+\subsubsection{Which APKs use open-source libraries with medium health?}
+The first question is which APKs contain at least one open-source library classified as \textit{medium health}. The analysis identifies \textbf{89} such APKs. For each APK, the aggregation records the number of medium-health evidence rows, the number of unique medium-health repositories, the number of matched classes associated with these libraries, and the percentage of the APK's total detected open-source class matches represented by medium-health libraries.
 
-The ranking is based on intensity of fragile library use (\texttt{medium\_fragility\_intensity\_pct\_of\_apk}). The highest observed values include \textit{Cabrillo Credit Union} at \textbf{10.67\%}, \textit{UK Credit Union} at \textbf{9.35\%}, and \textit{BrightStar CU Mobile} at \textbf{6.22\%} (Figure~\ref{fig:top-apks-medium-fragility-intensity}). These applications therefore show the strongest relative presence of medium-fragility libraries within their detected open-source class usage.
-
+The ranking is based on intensity of medium-health library use (\texttt{medium\_health\_intensity\_pct\_of\_apk}). The highest observed values include \textit{KidiCom Chat™ (FR)} at \textbf{18.75\%}, \textit{CEMAH netCEM} at \textbf{1.71\%}, and \textit{NeurOm} at \textbf{0.57\%} (Figure~\ref{fig:top-apks-medium-health-intensity}). These applications therefore show the strongest relative presence of medium-health libraries within their detected open-source class usage.
 
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\textwidth,keepaspectratio]{image/top_apps_by_medium_fragility_intensity.png}
-    \caption{Top 25 APKs by medium-fragility library usage intensity}
-    \label{fig:top-apks-medium-fragility-intensity}
+    \includegraphics[width=\textwidth,keepaspectratio]{image/top_apps_by_medium_health_intensity.png}
+    \caption{Top 10 APKs by medium-health library usage intensity}
+    \label{fig:top-apks-medium-health-intensity}
     \end{figure}
 
-\subsubsection{Which APKs use Medium-fragility libraries but uncited (cited = 0)?}
-The second part of the analysis focuses only on medium-fragility rows where \texttt{cited = 0}. These are cases where the pipeline found code evidence of a medium-fragility library, but no corresponding license declaration was identified in the APK evidence. The dataset contains \textbf{346} uncited medium-fragility rows, appearing across \textbf{268} distinct APKs.
+\subsubsection{Which APKs use medium-health libraries but uncited (cited = 0)?}
+The second part of the analysis focuses only on medium-health rows where \texttt{cited = 0}. These are cases where the pipeline found code evidence of a medium-health library, but no corresponding license declaration was identified in the APK evidence. The dataset contains \textbf{69} uncited medium-health rows, appearing across \textbf{34} distinct APKs.
 
-The leading APKs by uncited medium-fragility intensity include \textit{in.kontakt}, \textit{Tickz. App broker for trading}, and \textit{Los de la Isla CrossFit} (Figure~\ref{fig:top-apks-uncited-medium-fragility-intensity}). These cases are important because the relevant medium-fragility libraries are detected through code evidence but are not visible through license citation. As a result, even a technically skilled user would have little practical opportunity to identify these libraries from the APK disclosure information alone and react if one of them became risky.
-
-In Figure~\ref{fig:top-apks-uncited-medium-fragility-intensity}, FINANCE is the most frequent category with 12 applications. This partly reflects the overall corpus composition, where FINANCE is also the largest category. However, the presence of many finance apps in the uncited medium-fragility group also indicates that financial-sector applications need particularly careful dependency visibility and license-disclosure practices.
+The leading APKs by uncited medium-health library use intensity include \textit{HotepGold – Commodity Trading}, \textit{bevestor}, and \textit{Dubai Bus on Demand} (Figure~\ref{fig:top-apks-uncited-medium-health-intensity}). These cases are important because the relevant medium-health libraries are detected through code evidence but are not visible through license citation. As a result, even a technically skilled user would have little practical opportunity to identify these libraries from the APK disclosure information alone and react if one of them became risky.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth,keepaspectratio]{image/top_apps_by_uncited_medium_fragility_intensity.png}
-\caption{Top 25 APKs by uncited medium-fragility library usage intensity}
-\label{fig:top-apks-uncited-medium-fragility-intensity}
+\includegraphics[width=\textwidth,keepaspectratio]{image/top_apps_by_uncited_medium_health_intensity.png}
+\caption{Top 10 APKs by uncited medium-health library usage intensity}
+\label{fig:top-apks-uncited-medium-health-intensity}
 \end{figure}
 
 
@@ -699,12 +771,12 @@ From these findings, we can draw the following main interpretations:
 \item License disclosure is incomplete: 44.61\% of detected library occurrences are uncited, meaning they are found through code evidence but not through license declarations.
 \item The fingerprint-based method is effective for this research goal, because 96.06\% of cited library records are also confirmed by fingerprint evidence.
 \item Dependency usage varies widely across applications, from APKs with very few detected libraries to APKs with more than 400 library occurrences.
-\item Repository-level analysis shows that most detected GitHub libraries have low fragility, but medium-fragility libraries still appear in a meaningful subset of APKs (516 out of 699 APKs).
-\item Uncited medium-fragility libraries are especially important because users and auditors cannot easily identify them from license disclosure alone.
-\item Finance applications appear frequently among the top APKs with uncited medium-fragility intensity, indicating the need for stronger dependency visibility in sensitive sectors.
+\item Repository-level analysis shows that, among the 220 repositories with assigned Wang and Wu health levels, 204 are classified as high health and 16 as medium health, while no repository falls into the low-health category.
+\item Medium-health libraries appear in 225 APK/library evidence rows across 89 distinct APKs, representing 12.7\% of the analyzed application corpus.
+\item Uncited medium-health libraries are especially important because users and auditors cannot easily identify them from license disclosure alone; in this corpus, 69 uncited medium-health rows appear across 34 APKs.
 \end{itemize}
 
-Overall, the results show that the main issue is not only the presence of open-source libraries, but the gap between actual library usage and what is disclosed to users or reviewers.
+Overall, the results show that the main issue is not only the presence of open-source libraries, but the gap between actual library usage and what is disclosed to users or reviewers. The repository-health analysis adds another layer to this finding by showing which detected libraries come from repositories with lower health levels.
 
 \section{Implications for Developers}
 The findings show that many libraries are present in APK code but are not visible through license declarations. Developers should therefore make dependency visibility and license declaration part of the CI/CD process, not a final manual documentation step. Software composition analysis, SBOM-style documentation, fingerprint-based checks, and repository-health monitoring can help teams verify which libraries are actually embedded in their applications and reduce the gap between used and declared dependencies.
@@ -723,12 +795,14 @@ Yes. The developed pipeline successfully processed the APK corpus, decoded appli
 License declarations are useful but incomplete. In the final corpus, only 55.39\% of detected library occurrences were cited, while 44.61\% were uncited and visible only through code evidence. Package fingerprints were more effective for detection: 96.06\% of cited library records were also confirmed by fingerprint evidence. This supports the use of fingerprints as the main detection method, with license exposure used mainly for citation validation.
 
 \textbf{RQ3: How many open-source libraries, and what types of them, are used in a sample of Android applications?}
-The final corpus contains 636 unique repository URLs and an average of 154.84 detected library occurrences per APK. The libraries are mainly detected through Java and Kotlin package fingerprints. Repository-level analysis also showed that most detected GitHub repositories fall into the low-fragility group, while 23 repositories were classified as medium fragility and none as high fragility.
+The final corpus contains 636 unique repository URLs and an average of 154.84 detected library occurrences per APK. The libraries are mainly detected through Java and Kotlin package fingerprints. Repository-level analysis also showed that among the 220 GitHub repositories with assigned health levels, 204 repositories were classified as high health, 16 repositories were classified as medium health, and no repository was classified as low health.
 
-\textbf{RQ4: Which Android applications show the highest dependency on fragile open source libraries?}
-The analysis identified 346 uncited medium-fragility rows across 268 APKs. The leading applications by uncited medium-fragility intensity include \textit{in.kontakt}, \textit{Tickz. App broker for trading}, and \textit{Los de la Isla CrossFit}. Among the top 25 APKs in this ranking, FINANCE is the most frequent category, indicating that dependency visibility is especially important for sensitive financial applications.
+\textbf{RQ4: Which Android applications show the highest dependency on low-health or medium-health open-source libraries?}
+The analysis identified 225 medium-health APK/library evidence rows across 89 distinct APKs and it doesn't identify any low-health libraries. Dependency strength was measured by medium-health library use intensity, meaning the percentage of an APK's total detected open-source class matches that belong to medium-health repositories. Based on this intensity measure, the leading applications are \textit{KidiCom Chat™ (FR)}, \textit{CEMAH netCEM}, and \textit{NeurOm}. These applications therefore have the strongest relative exposure to medium-health libraries within their detected open-source code evidence.
 
-Overall, the practical part of the thesis was applicable and completed: the APK collection was built, the decoding and matching pipeline was implemented, GitHub metadata was collected, repository metrics were calculated, and the final dataset was analyzed. The pipeline can also target a standalone APK, add it to the corpus, identify its open-source library ingredients, assess which ones appear fragile, and compare it with other APKs. Some expectations were only partially achieved. The corpus size remained limited by hardware and lookup time, the sample was not category-balanced, manual validation was limited because most applications did not expose in-app license information, and the method cannot prove runtime execution of a library. Therefore, the results should be interpreted as evidence of embedded library presence and disclosure gaps, not as a complete runtime security assessment.
+Overall, the practical part of the thesis was applicable and completed: the APK collection was built, the decoding and matching pipeline was implemented, GitHub metadata was collected, repository health scores were calculated, and the final dataset was analyzed. The pipeline can also target a standalone APK, add it to the corpus, identify its open-source library ingredients, assess their repository health levels, and compare it with other APKs. The validation chapter showed that in-app license screens are usually not a reliable validation baseline, while the F-Droid source-code control set provided a more useful approximate ground truth and confirmed that the pipeline can recover a meaningful portion of dependency evidence, although both precision and recall remain limited by differences between compiled APK contents and source-code declarations.
+
+Some expectations were only partially achieved. The corpus size remained limited by hardware and lookup time, the sample was not category-balanced, manual validation was limited because most applications did not expose in-app license information, and the method cannot prove runtime execution of a library. Therefore, the results should be interpreted as evidence of embedded library presence, repository-health context, and disclosure gaps, not as a complete runtime security assessment.
 
 \section{Future Work}
 The pipeline created a labeled corpus that records which files and lines contain evidence of external library imports, exports, and class references. This creates an opportunity for future work based on text analysis and machine learning. Instead of relying only on rule-based fingerprint matching and repeated lookup operations, future versions of the system could tokenize the indexed evidence lines and train a model to classify whether a line is likely to indicate external library usage. Such a model could use features from package names, import patterns, file paths, comments, and surrounding code context.
@@ -741,6 +815,47 @@ This direction is realistic because prior research has shown that source-code to
 \chapter*{Appendix}
 \addcontentsline{toc}{chapter}{Appendix}
 
+\section{Wang and Wu OSS Repository Health Model}\label{app:wang2022-health-model}
+
+This appendix summarizes only the research method of \textcite{wangMethodEvaluateHealth2022}, because the main analysis chapter adopts their repository health-score framework.
+
+\subsection{Methodological Structure}
+
+Wang and Wu evaluate open-source software project health using the pressure--state--response (PSR) model. In their adaptation, the pressure layer represents external pressure on the project, the state layer represents the current condition of the project, and the response layer represents the project's ability to react to problems or attacks. Each layer contains a group of repository indicators, and the final health score is calculated from the weighted values of these indicators. The model uses 12 indicators in total, grouped into the three PSR layers. The indicators and their final weights are listed in Table~\ref{tab:wang2022-health-factors} in the main analysis chapter.
+
+\subsection{Data and Preprocessing}
+
+In the original study, Wang and Wu use GitHub project data collected through GHTorrent. Their empirical design relies on repository activity, issue, pull-request, contributor, and communication-related records. Because these indicators use different units and scales, the authors first transform them into comparable normalized values. Positive indicators are normalized so that larger raw values produce larger normalized values. Negative indicators are normalized in the opposite direction so that larger raw values produce smaller normalized values.
+
+\subsection{Weighting Method}
+
+A key methodological contribution of Wang and Wu is their combination weighting approach. They combine a subjective weighting method with an objective weighting method. The subjective part uses the analytic hierarchy process (AHP), where indicators are compared within the same PSR layer to express their relative importance. The objective part uses the entropy method, where indicators receive weight according to the amount of information and variation they contribute in the observed data.
+
+The final indicator weights are calculated as a linear combination of the AHP weights and the entropy weights:
+
+\begin{equation}
+ w = \mu w_{AHP} + (1 - \mu)w_{Entropy}
+\end{equation}
+
+where \(w\) is the final indicator weight, \(w_{AHP}\) is the subjective AHP weight, \(w_{Entropy}\) is the objective entropy weight, and \(\mu\) controls the balance between the two components. In this thesis, the final published weights reported by Wang and Wu are adopted directly, instead of recalculating new weights from the APK corpus.
+
+\subsection{Health-Score Calculation}
+
+After normalization and weighting, each PSR layer is calculated as a weighted sum of its indicators:
+
+\begin{equation}
+ H_i = \sum_{j=1}^{m} w_j \times p_{ij}
+\end{equation}
+
+where \(H_i\) is the layer score, \(w_j\) is the weight of indicator \(j\), and \(p_{ij}\) is the normalized value of that indicator. The final repository health score is then calculated by combining the pressure, state, and response layer scores:
+
+\begin{equation}
+ H = \left(\frac{H_P + H_S + H_R}{3}\right) \times 100
+\end{equation}
+
+This produces one repository-level health score.
+
+\section{Extra Figures and Tables}
 \noindent\textbf{Supporting figures for pipeline and validation.} The following figures are supplementary materials referenced in the previous chapters.
 
 \begin{figure}[htbp]
@@ -803,13 +918,9 @@ This direction is realistic because prior research has shown that source-code to
     Library occurrences detected by license-exposure & 251 \\
     Library occurrences detected by fingerprint and license-exposure & 53 \\
     Cited Library occurrences found by fingerprints & 57 \\
-    Medium fragility library occurrences & 2 \\
-    Uncited medium fragility library occurrences & 1 \\
-    Total intensity of medium fragility libraries & 0.10\% \\
+    Medium health library occurrences & 0 \\
     \hline
     \end{tabular}
-    
-    {\footnotesize\textit{Note.} Two medium-fragility libraries were detected: \url{https://github.com/chrisbanes/snapper/}, which was cited, and \url{https://github.com/mapbox/mapbox-gl-native}, which was not cited.}
     \end{table}
 
 
@@ -878,13 +989,11 @@ Minimum library occurrences per APK & 1 \\
 Maximum library occurrences per APK & 550 \\
 Unique repository URLs & 636\textsuperscript{*} \\
 Unique cloned GitHub repository attempts & 274\textsuperscript{*} \\
-GitHub repositories found & 257 \\
-GitHub repositories not found or returned error & 17 \\
+GitHub repositories found & 220 \\
+GitHub repositories not found or returned error & 54 \\
 \hline
 \end{tabular}
 
 {\footnotesize\textit{Note.} The number of unique repository URLs is higher than the number of cloned GitHub repository attempts because some repositories contain more than one library, and some license URLs point to a specific library or subdirectory inside a repository rather than to a separate repository.}
 \end{table}
-
-
 \end{document}

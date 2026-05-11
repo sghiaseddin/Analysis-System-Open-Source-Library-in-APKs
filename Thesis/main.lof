@@ -5,28 +5,26 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {6.1}{\ignorespaces Overview of the data acquisition and analysis pipeline}}{25}{figure.6.1}%
-\contentsline {figure}{\numberline {6.2}{\ignorespaces Sample evidence of Glide library usage in a decoded APK}}{27}{figure.6.2}%
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Overview of the data acquisition and analysis pipeline}}{26}{figure.6.1}%
+\contentsline {figure}{\numberline {6.2}{\ignorespaces Sample evidence of Glide library usage in a decoded APK}}{28}{figure.6.2}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {7.1}{\ignorespaces Distribution of library occurrence rows per APK}}{31}{figure.7.1}%
-\contentsline {figure}{\numberline {7.2}{\ignorespaces Growth of unique libraries discovered as corpus size increases}}{31}{figure.7.2}%
-\contentsline {figure}{\numberline {7.3}{\ignorespaces Share of cited library records also confirmed by fingerprint evidence across corpus sizes}}{32}{figure.7.3}%
-\contentsline {figure}{\numberline {7.4}{\ignorespaces Ratio of declared vs. undeclared libraries across corpus sizes}}{32}{figure.7.4}%
-\contentsline {figure}{\numberline {7.5}{\ignorespaces Top 10 repositories by popularity score in the APK corpus}}{34}{figure.7.5}%
-\contentsline {figure}{\numberline {7.6}{\ignorespaces Top 10 repositories by activity score in the APK corpus}}{35}{figure.7.6}%
-\contentsline {figure}{\numberline {7.7}{\ignorespaces Top 10 repositories by fragility score in the APK corpus}}{36}{figure.7.7}%
-\contentsline {figure}{\numberline {7.8}{\ignorespaces Distribution of repositories across fragility levels in the APK corpus}}{37}{figure.7.8}%
-\contentsline {figure}{\numberline {7.9}{\ignorespaces Relationship between popularity, activity, and fragility level}}{38}{figure.7.9}%
+\contentsline {figure}{\numberline {7.1}{\ignorespaces Distribution of library occurrence rows per APK}}{32}{figure.7.1}%
+\contentsline {figure}{\numberline {7.2}{\ignorespaces Growth of unique libraries discovered as corpus size increases}}{32}{figure.7.2}%
+\contentsline {figure}{\numberline {7.3}{\ignorespaces Share of cited library records also confirmed by fingerprint evidence across corpus sizes}}{33}{figure.7.3}%
+\contentsline {figure}{\numberline {7.4}{\ignorespaces Ratio of declared vs. undeclared libraries across corpus sizes}}{33}{figure.7.4}%
+\contentsline {figure}{\numberline {7.5}{\ignorespaces Top 10 repositories health score in the APK corpus}}{36}{figure.7.5}%
+\contentsline {figure}{\numberline {7.6}{\ignorespaces Distribution of repositories across health levels in the APK corpus}}{37}{figure.7.6}%
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {8.1}{\ignorespaces Distribution of detected library occurrences per APK in the F-Droid validation set}}{39}{figure.8.1}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {9.1}{\ignorespaces Distribution of cited versus uncited libraries}}{42}{figure.9.1}%
-\contentsline {figure}{\numberline {9.2}{\ignorespaces Distribution of detected library occurrences per APK}}{42}{figure.9.2}%
-\contentsline {figure}{\numberline {9.3}{\ignorespaces Top 25 APKs by medium-fragility library usage intensity}}{44}{figure.9.3}%
-\contentsline {figure}{\numberline {9.4}{\ignorespaces Top 25 APKs by uncited medium-fragility library usage intensity}}{45}{figure.9.4}%
+\contentsline {figure}{\numberline {9.1}{\ignorespaces Distribution of cited versus uncited libraries}}{44}{figure.9.1}%
+\contentsline {figure}{\numberline {9.2}{\ignorespaces Distribution of detected library occurrences per APK}}{44}{figure.9.2}%
+\contentsline {figure}{\numberline {9.3}{\ignorespaces Top 10 APKs by medium-health library usage intensity}}{46}{figure.9.3}%
+\contentsline {figure}{\numberline {9.4}{\ignorespaces Top 10 APKs by uncited medium-health library usage intensity}}{47}{figure.9.4}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {1}{\ignorespaces The regular expressions to capture fingerprints in varius languages such as Java (code in python)}}{53}{figure.Alph0.1}%
-\contentsline {figure}{\numberline {2}{\ignorespaces Distribution of fingerprint types used to detect library evidence by application category in the final APK corpus}}{53}{figure.Alph0.2}%
-\contentsline {figure}{\numberline {3}{\ignorespaces Total detected library occurrences as the APK corpus size increases}}{54}{figure.Alph0.3}%
-\contentsline {figure}{\numberline {4}{\ignorespaces Detection origin of cited library records, comparing fingerprint evidence and license-exposure evidence by application category}}{54}{figure.Alph0.4}%
-\contentsline {figure}{\numberline {5}{\ignorespaces BudapestGO in-app license screen generated through Sentry, a helper tool used in the CI/CD stack to audit runtime external libraries and export their licenses. Screenshot address: Menu, Information and help, License.}}{55}{figure.Alph0.5}%
-\contentsline {figure}{\numberline {6}{\ignorespaces Histogram of detected library occurrences per APK in the final corpus}}{56}{figure.Alph0.6}%
+\contentsline {figure}{\numberline {1}{\ignorespaces The regular expressions to capture fingerprints in varius languages such as Java (code in python)}}{56}{figure.Alph0.1}%
+\contentsline {figure}{\numberline {2}{\ignorespaces Distribution of fingerprint types used to detect library evidence by application category in the final APK corpus}}{57}{figure.Alph0.2}%
+\contentsline {figure}{\numberline {3}{\ignorespaces Total detected library occurrences as the APK corpus size increases}}{57}{figure.Alph0.3}%
+\contentsline {figure}{\numberline {4}{\ignorespaces Detection origin of cited library records, comparing fingerprint evidence and license-exposure evidence by application category}}{58}{figure.Alph0.4}%
+\contentsline {figure}{\numberline {5}{\ignorespaces BudapestGO in-app license screen generated through Sentry, a helper tool used in the CI/CD stack to audit runtime external libraries and export their licenses. Screenshot address: Menu, Information and help, License.}}{59}{figure.Alph0.5}%
+\contentsline {figure}{\numberline {6}{\ignorespaces Histogram of detected library occurrences per APK in the final corpus}}{60}{figure.Alph0.6}%

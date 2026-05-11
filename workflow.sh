@@ -70,6 +70,23 @@ else
     echo "Skipping: Step 2"
 fi
 
+# Add 100 open-source F-Droid APKs using Google Play Store category scraper
+# input: latest_playstore_per_pkg.csv
+# input: awesome-fdroid-dataset.csv
+# output: tagged_apps.csv
+if step "Step 2.1: Add F-Droid open-source APKs using scraper"; then
+    python ./src/tag_fdroid_apps_by_play_store_scraper.py \
+        --input-data ./database/latest_playstore_per_pkg.csv \
+        --fdroid-data ./database/awesome-fdroid-dataset.csv \
+        --output-data ./database/tagged_apps.csv \
+        --excluded-apps $EXCLUDED_APS \
+        --log-every 10 \
+        --research-categories $RESEARCH_CATEGORY \
+        --limit 100 || exit 1
+else
+    echo "Skipping: Step 2.1"
+fi
+
 # Download apk files from https://androzoo.uni.lu/api_doc
 # input: tagged_apps.csv
 # output: apks/[sha256].apk
@@ -160,7 +177,20 @@ fi
 # input: aggregate-reports --> directory
 # output: analysis_datasets/dataset_$LIMIT_ARG.csv
 if step "Step 12: Create analysis dataset"; then
-    python ./src/create_analysis_dataset.py --input-dir ./aggregate-reports --output-dir ./analysis_datasets "$LIMIT_ARG" || exit 1
+    python ./src/create_analysis_dataset.py --input-dir ./aggregate-reports --output-dir ./analysis_datasets --limit "$LIMIT_ARG" || exit 1
 else
     echo "Skipping: Step 12"
+fi
+
+
+# Clone F-Droid source-code repositories and extract library declarations
+# input: tagged_apps.csv
+# output: source_code_libraries.csv
+if step "Step 13: Extract libraries from F-Droid source code"; then
+    python ./src/extract_lib_from_source_code.py \
+        --tagged-apps ./database/tagged_apps.csv \
+        --source-dir ./data/app_source_code \
+        --output-data ./database/source_code_libraries.csv || exit 1
+else
+    echo "Skipping: Step 13"
 fi
