@@ -1,13 +1,13 @@
 # Fdb version 4
-["biber main"] 1778484846.97713 "main.bcf" "main.bbl" "main" 1778486144.30028 0
-  "main.bcf" 1778486144.22316 148469 e1f94bc44a54ffc895c1ca9833d930aa "pdflatex"
+["biber main"] 1778623207.27046 "main.bcf" "main.bbl" "main" 1778656200.92498 0
+  "main.bcf" 1778656200.85259 145123 47837dc44f8fa88507b134ac256b7be4 "pdflatex"
   "references.bib" 1778477817.5562 154809 d6240d9c6477c62e1c7ae1282814facf ""
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1778486139.51364 "/Users/shayan/Documents/Corvinus Works/2025-02/Thesis Work 1/Analysis-System-Open-Source-Library-in-APKs/Thesis/main.tex" "main.pdf" "main" 1778486144.30055 0
-  "/Users/shayan/Documents/Corvinus Works/2025-02/Thesis Work 1/Analysis-System-Open-Source-Library-in-APKs/Thesis/main.tex" 1778486139.30681 117563 c5dc340cdc827a742ba177c0781a2444 ""
+["pdflatex"] 1778656196.34928 "/Users/shayan/Documents/Corvinus Works/2025-02/Thesis Work 1/Analysis-System-Open-Source-Library-in-APKs/Thesis/main.tex" "main.pdf" "main" 1778656200.92524 0
+  "/Users/shayan/Documents/Corvinus Works/2025-02/Thesis Work 1/Analysis-System-Open-Source-Library-in-APKs/Thesis/main.tex" 1778656191.40351 115684 8c392497e7e2ae5e85987a6e0c523771 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/tfm/jknappen/ec/tcrm1200.tfm" 1136768653 1536 74b7293ec3713bb7fdca8dd1bd1f469c ""
@@ -162,14 +162,14 @@
   "image/top_repositories_by_health_score.png" 1778450547.22102 138887 5c1503765801d5a5fc2fcce3624fd072 ""
   "image/total_library_occurrences_by_apk_collection_size.png" 1777877589.28663 100177 4b6616b7d50ae4f7e7b11984d897363c ""
   "image/unique_open_source_libraries_by_apk_collection_size.png" 1777877589.43627 101770 862b9ce9758118d6438820ff5161eb99 ""
-  "main.aux" 1778486144.2055 53193 bb8ae20ef1fac27ca9fcb2e518c3ed74 "pdflatex"
-  "main.bbl" 1778484848.98577 284572 3f67d4dd40cb346368343282948a25b1 "biber main"
-  "main.lof" 1778486144.22389 3134 e03568229203167565011015483d36c2 "pdflatex"
-  "main.lot" 1778486144.22392 1299 cc811bcbb41fff951e43f669b71dee4f "pdflatex"
-  "main.out" 1778486144.22219 16085 cf67c88d44402e86a71afa8ec96a395a "pdflatex"
-  "main.run.xml" 1778486144.22375 2427 d1bfcd6d722f5bf4e724fdcb22d9bbf2 "pdflatex"
-  "main.tex" 1778486139.30681 117563 c5dc340cdc827a742ba177c0781a2444 ""
-  "main.toc" 1778486144.22381 7529 d0cc556218dc160f8454e906515b7629 "pdflatex"
+  "main.aux" 1778656200.83774 47854 34e29d8d1b3ba0e160234ed9cdda767b "pdflatex"
+  "main.bbl" 1778623208.99016 284572 3f67d4dd40cb346368343282948a25b1 "biber main"
+  "main.lof" 1778656200.85323 3146 ec0376bd229e855daa18b3014df2b291 "pdflatex"
+  "main.lot" 1778656200.85325 1299 ba9ab86f834efec7877f538eb442f33a "pdflatex"
+  "main.out" 1778656200.85167 15816 1edcc65fed127e673341e1e3916ce76d "pdflatex"
+  "main.run.xml" 1778656200.85314 2427 d1bfcd6d722f5bf4e724fdcb22d9bbf2 "pdflatex"
+  "main.tex" 1778656191.40351 115684 8c392497e7e2ae5e85987a6e0c523771 ""
+  "main.toc" 1778656200.8532 7419 c7cc35a93c145a7812fa4ab7add8e0fa "pdflatex"
   (generated)
   "main.aux"
   "main.bcf"

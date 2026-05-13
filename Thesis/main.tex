@@ -68,7 +68,7 @@ Modern Android applications are built from many external open-source libraries. 
 
 This thesis addresses that problem by developing an automated pipeline for detecting open-source library usage in compiled Android APK files. The pipeline collects APKs, decodes them, extracts license information, builds fingerprints from public source-code repositories, and matches those fingerprints against decoded application code. This makes it possible to compare what an application declares in its license information with what is actually detected in the code.
 
-The final analysis is based on a corpus of 699 Android APKs from sensitive categories such as finance, health, communication, and navigation. The results show that Android applications rely heavily on external libraries, with an average of 154.84 detected library occurrences per APK. However, 44.61\% of detected library occurrences were not cited in license declarations. The fingerprint-based method proved effective, confirming most library usage through code evidence and revealing dependencies that license information alone would miss.
+The final analysis is based on a corpus of 699 Android APKs from sensitive categories such as finance, health, communication, and navigation. The results show that Android applications rely heavily on external libraries, with an average of 154.84 detected open source libraries per APK. However, 44.61\% of detected libraries were not cited in license declarations. After investigating repository of open source libraries, the analysis also shows that 89 applications depend on at least one medium-health libraries, including 34 cases where those libraries are uncited. The fingerprint-based method proved effective, confirming most library usage through code evidence and revealing dependencies that license information alone would miss.
 
 Overall, the thesis shows that the main risk is not simply the use of open-source libraries, but the gap between actual library usage and visible disclosure. The proposed pipeline provides a practical way to measure this gap and supports better dependency transparency in Android applications. In practical use, the pipeline can analyze a given APK and report which open-source libraries it contains and how healthy those libraries appear to be.
 
@@ -82,14 +82,14 @@ In this thesis, the terms \emph{external libraries}, \emph{open source libraries
 
 The objective of this thesis is to develop an automated and scalable pipeline capable of extracting references to open source libraries from Android APK files. The research aims to build a dataset of commonly used applications, detect declared and undeclared library dependencies, and analyze the extent of these dependencies. Another goal is to evaluate how reliably library usage can be identified through license declarations, package fingerprints, and repository metadata, and to assess the feasibility of large-scale dependency analysis in mobile applications. The thesis also aims to identify applications with the highest intensity of uncited unhealthy open source library usage.
 
-The study is limited to Android APK files and does not cover iOS applications or other mobile platforms. It also does not validate decoded APK evidence against the original application source code, because that source code is generally unavailable. Finally, the thesis does not audit applications at runtime; library usage is evaluated through static evidence extracted from decoded APKs.
+The study is limited to Android APK files and does not cover iOS applications or other mobile platforms. For the main APK corpus, decoded evidence is not validated against original application source code, because that source code is generally unavailable. However, for the separate validation dataset, I intentionally selected applications with available source code and performed this comparison, as discussed in Chapter~\ref{validation}. Finally, the thesis does not audit applications at runtime; library usage is evaluated through static evidence extracted from decoded APKs.
 
 \section{Research Questions}
 The research is guided by the following questions:
 \begin{itemize}
 \item (RQ1) Is it feasible to detect external libraries in Android APK files?
 \item (RQ2) How reliable are license declarations and package fingerprints for identifying library dependencies?
-\item (RQ3) How many open source libraries, and what types of them, are used in a sample of Android applications?
+\item (RQ3) How many open source libraries, and on what health level, are used in a sample of Android applications?
 \item (RQ4) Which Android applications show the highest dependency on low-health or medium-health open-source libraries?
 \end{itemize}
 
@@ -122,7 +122,7 @@ During the 2000s, open source became commercially mainstream. Organizations incr
 
 In the 2010s, \emph{microservices architecture} and \emph{cloud computing} accelerated the shift toward dependency-based development. Applications began to consist of many small, independently deployable components, often combined with third-party libraries and external services. Modern software projects frequently contain relatively little original code, acting instead as orchestration layers around large dependency graphs maintained by global developer communities \parencite{newmanMonolithMicroservicesEvolutionary2019,aguilaSoftwareEngineeringTimeline2020}.
 
-As a result of this historical evolution, contemporary software development depends heavily on external libraries and open-source components. While this modular ecosystem enables rapid innovation, it also creates challenges related to dependency management, transparency, and security, especially when the exact set of third-party components used by an application is not clearly documented. These challenges motivate the need for methods capable of identifying and analyzing dependencies in softwares.
+As a result of this historical evolution, contemporary software development depends heavily on external libraries and open-source components. While this modular ecosystem enables rapid innovation, it also creates challenges related to dependency management, transparency, and security, especially when the exact set of third-party components used by an application is not clearly documented. These challenges motivate the need for methods capable of identifying and analyzing software dependencies. But first, we focus on the benefits of open-source libraries.
 
 \section{Open Source Libraries and Their Benefits}
 
@@ -188,12 +188,12 @@ These findings align with broader supply-chain concerns. Sonatype argues that so
 \chapter{Literature Review}
 
 \section{Review-Based Studies Relevant to the Thesis}
-This literature review focuses on review papers and survey-based studies that synthesize prior research on Android third-party libraries, open-source license management, software supply chain security, Android vulnerability detection, Android malware analysis, and dynamic Android security analysis. This choice is appropriate for the present thesis because the topic sits at the intersection of several research streams, and review papers provide a structured overview of the dominant questions, methods, findings, and unresolved gaps in those streams \parencite{zhanResearchThirdPartyLibraries2022,zhanAutomatedThirdpartyLibrary2021,reichertSoftwareSupplyChain2024,williamsResearchDirectionsSoftware2025,senanayakeAndroidSourceCode2023,sutterDynamicSecurityAnalysis2024,dahiyaAndroidMalwareAnalysis2025,liOpenSourceHidden2025,zakeyaProbingAndroVulDataset2022}.
+This literature review focuses on review papers and survey-based studies that synthesize prior research on Android third-party libraries, open-source license management, software supply chain security, Android vulnerability detection, Android malware analysis, and dynamic Android security analysis. I used these studies because the topic sits at the intersection of several research streams, and review papers provide a structured overview of the dominant questions, methods, findings, and unresolved gaps in those streams.
 
-The most central review for this thesis is the systematic literature review by \textcite{zhanResearchThirdPartyLibraries2022}, because it directly maps research on third-party libraries in Android applications. However, the topic cannot be understood from Android library detection alone. Library identification in APKs is strongly connected to software supply chain security, because embedded open-source components can introduce vulnerabilities, privacy risks, license obligations, and maintenance problems into downstream applications \parencite{reichertSoftwareSupplyChain2024,williamsResearchDirectionsSoftware2025,liOpenSourceHidden2025}. It is also closely connected to Android security-analysis research, where third-party code is often treated either as a source of risk or as noise that must be separated from app-specific code in malware and vulnerability studies \parencite{dahiyaAndroidMalwareAnalysis2025,senanayakeAndroidSourceCode2023,sutterDynamicSecurityAnalysis2024}.
+The most central review for this thesis is the systematic literature review by \textcite{zhanResearchThirdPartyLibraries2022}, because it directly maps research on third-party libraries in Android applications. Also, library identification in APKs is strongly connected to software supply chain security, because embedded open-source components can introduce vulnerabilities, privacy risks, license obligations, and maintenance problems into downstream applications. It is also closely connected to Android security-analysis research, where third-party code is often treated either as a source of risk or as noise that must be separated from app-specific code in malware and vulnerability studies.
 
 \section{Main Research Questions, Methods, and Findings in the Review Corpus}
-Table~\ref{tab:review-corpus-questions} summarizes the dominant primary-study question types reconstructed from the review corpus most relevant to this thesis. Rather than reproducing the review papers' own research questions, the table captures the recurring question types that those reviews report across their underlying primary studies \parencite{zhanResearchThirdPartyLibraries2022,dahiyaAndroidMalwareAnalysis2025,senanayakeAndroidSourceCode2023,sutterDynamicSecurityAnalysis2024,reichertSoftwareSupplyChain2024,williamsResearchDirectionsSoftware2025,liOpenSourceHidden2025,zakeyaProbingAndroVulDataset2022,zhanAutomatedThirdpartyLibrary2021}.
+Table~\ref{tab:review-corpus-questions} summarizes the dominant primary-study question types reconstructed from the review corpus most relevant to this thesis. Rather than reproducing the review papers' own research questions, the table captures the recurring question types that those reviews report across their underlying primary studies. The strongest support comes from the systematic reviews on Android third-party libraries.
 
 {\small
 \setlength{\tabcolsep}{4pt}
@@ -212,7 +212,7 @@ Table~\ref{tab:review-corpus-questions} summarizes the dominant primary-study qu
 \endfoot
 How can third-party or open-source libraries be identified inside APKs, especially when apps are obfuscated, minimized, or repackaged? \parencite{zhanResearchThirdPartyLibraries2022,zhanAutomatedThirdpartyLibrary2021} & APK reverse engineering, package and class signature matching, code-similarity methods, feature matching, empirical detector construction, and benchmarking & Library identification is a major research stream, but existing approaches still struggle with obfuscation, partial imports, and version variation \\
 
-How can researchers distinguish library code from app-specific code so that malware detection, clone detection, and repackaging analysis are not distorted? \parencite{zhanResearchThirdPartyLibraries2022} & Preprocessing pipelines, library filtering and removal, whitelist and non-whitelist detection, and comparative experiments with and without TPL removal & Third-party libraries are repeatedly treated as noise in app analysis; removing or identifying them improves downstream analyses, but whitelist methods remain limited \\
+How can researchers distinguish library code from app-specific code so that malware detection, clone detection, and repackaging analysis are not distorted? \parencite{zhanResearchThirdPartyLibraries2022} & Preprocessing pipelines, library filtering and removal, whitelist and non-whitelist detection, and comparative experiments with and without Third-party libraries (TPL) removal & TPLs are repeatedly treated as noise in app analysis; removing or identifying them improves downstream analyses, but whitelist methods remain limited \\
 
 What security and privacy risks do embedded libraries introduce into Android apps? \parencite{zhanResearchThirdPartyLibraries2022} & Static analysis, taint and data-flow analysis, permission analysis, privacy-flow inspection, and market-scale app measurement & Primary studies consistently show that TPLs can introduce privacy leakage, security exposure, and wider attack surfaces in host apps \\
 
@@ -222,13 +222,7 @@ How can dependency conflicts and version conflicts caused by third-party librari
 
 How can Android apps or libraries be analyzed when they use obfuscation, packing, or anti-analysis techniques? \parencite{zhanResearchThirdPartyLibraries2022,sutterDynamicSecurityAnalysis2024,dahiyaAndroidMalwareAnalysis2025} & Obfuscation-resilient matching, anti-evasion experiments, hardened instrumentation, and hybrid analysis & Obfuscation and anti-analysis remain core reasons for false negatives and incomplete coverage in both library detection and security analysis \\
 
-Which approach is most effective for Android malware or security analysis: static, dynamic, or hybrid analysis? \parencite{dahiyaAndroidMalwareAnalysis2025,sutterDynamicSecurityAnalysis2024,senanayakeAndroidSourceCode2023} & Comparative malware-detection pipelines, feature extraction, machine-learning and deep-learning classification, sandboxing, and runtime monitoring & Static analysis dominates because it is efficient, while dynamic and hybrid methods are repeatedly presented as more precise for harder cases such as zero-day or behavior-dependent threats \\
-
-Which features are most useful for detecting malicious or vulnerable Android behavior? \parencite{dahiyaAndroidMalwareAnalysis2025,senanayakeAndroidSourceCode2023} & Feature engineering from permissions, API calls, opcodes, system calls, network traces, and semantic code representations & Permissions and API calls are widely used in static analysis, while system calls and runtime traces are common in dynamic analysis; ML and DL studies depend heavily on feature quality \\
-
 Which machine-learning or deep-learning models perform best for Android malware or vulnerability detection? \parencite{dahiyaAndroidMalwareAnalysis2025,senanayakeAndroidSourceCode2023,zakeyaProbingAndroVulDataset2022} & Supervised classification, deep learning, semi-supervised learning, and comparative evaluation on malware or vulnerability datasets & Many studies compare classifiers, but the reviews do not indicate one universally best model; performance varies with features, datasets, and experimental design \\
-
-Which datasets, repositories, and tools are reliable for Android malware and vulnerability research? \parencite{dahiyaAndroidMalwareAnalysis2025,senanayakeAndroidSourceCode2023,zakeyaProbingAndroVulDataset2022} & Benchmark evaluation, dataset construction, combined-dataset creation, tool comparison, and dataset probing & The corpus repeatedly questions dataset quality, labeling, imbalance, and age; many studies combine sources rather than relying on a single benchmark \\
 
 How can Android source-code vulnerabilities be detected as early as possible during development? \parencite{senanayakeAndroidSourceCode2023} & Static code analysis, bytecode analysis, reverse engineering, machine learning on code representations, and developer-tool proposals & The reviewed corpus strongly emphasizes early detection in development workflows rather than post-release discovery only \\
 
@@ -238,15 +232,11 @@ What dynamic analysis techniques best reveal runtime security problems that stat
 
 How can dynamic analysis achieve enough code coverage and realistic behavior triggering? \parencite{sutterDynamicSecurityAnalysis2024} & Automated UI testing, event generation, fuzzing, and emulator- and device-based experimentation & Code coverage is one of the most repeated limitations in the dynamic-analysis corpus, affecting validity and completeness of findings \\
 
-How can analysts overcome detection or obstruction of instrumentation during runtime analysis? \parencite{sutterDynamicSecurityAnalysis2024} & Frida- and Xposed-based instrumentation, kernel-level instrumentation, and detection-resistance techniques & Many apps actively detect or obstruct instrumentation, so resistance to dynamic-analysis evasion is a recurring research problem \\
-
 How should third-party and open-source components in Android apps be understood as part of the broader software supply chain? \parencite{reichertSoftwareSupplyChain2024,williamsResearchDirectionsSoftware2025} & Dependency mapping, software composition analysis, supply-chain threat modeling, and component risk analysis & The broader literature positions libraries not just as app components, but as supply-chain elements whose weaknesses can propagate downstream \\
 
 How can the licenses of reused OSS components be identified, assessed, and managed? \parencite{liOpenSourceHidden2025} & License identification, risk assessment, mitigation and compliance workflows, and software-composition-analysis and SBOM-oriented studies & The OSS literature repeatedly asks not only what code is reused, but also what legal obligations and compatibility risks come with that reuse \\
 \end{longtable}
 }
-
-\noindent\textit{Note.} The table reconstructs the dominant primary-study question types reported across the review papers most relevant to this thesis, rather than reproducing the review papers' own formal research questions. The strongest support comes from the systematic reviews on Android third-party libraries, Android malware analysis, Android source-code vulnerability detection, dynamic Android security analysis, software supply chain security, and OSS license management \parencite{zhanResearchThirdPartyLibraries2022,dahiyaAndroidMalwareAnalysis2025,senanayakeAndroidSourceCode2023,sutterDynamicSecurityAnalysis2024,reichertSoftwareSupplyChain2024,williamsResearchDirectionsSoftware2025,liOpenSourceHidden2025}.
 
 \section{Why This Topic Attracts Research Attention}
 The review corpus points to four main reasons why this topic has become important. First, Android applications depend heavily on third-party and open-source code. \textcite{zhanResearchThirdPartyLibraries2022} note that third-party libraries represent a substantial share of Android application code, which makes their analysis a central rather than peripheral issue. Second, these libraries introduce security, privacy, and maintenance risks, including data leakage, increased attack surfaces, vulnerable dependencies, and dependency conflicts \parencite{zhanResearchThirdPartyLibraries2022,senanayakeAndroidSourceCode2023}. Third, the issue is now framed as part of the broader software supply chain security problem, where weaknesses in external components can propagate downstream across many systems \parencite{reichertSoftwareSupplyChain2024,williamsResearchDirectionsSoftware2025}. Fourth, there is a legal and organizational dimension: reused open-source components may create license-compliance obligations and compatibility risks that are difficult to identify and manage in practice \parencite{liOpenSourceHidden2025}. This thesis is closest to the first and third areas, because it focuses on detecting Android library usage and making hidden software supply-chain relationships more visible.
@@ -261,7 +251,7 @@ More specifically for Android, \textcite{zhanResearchThirdPartyLibraries2022} re
 \section{Research Design}
 This research follows an empirical software‑engineering methodology in which a sample of real Android applications is collected, processed automatically, and analyzed to extract information about open‑source library usage. The overall approach consists of three main phases: data acquisition, automated dependency extraction, and analytical evaluation of the resulting dataset. The goal is not to study a single application, but to build a repeatable pipeline that can process many APK files and generate structured information about external libraries and their characteristics.
 
-The methodology is exploratory and data-driven. As we will see in the following sections, the study does not rely only on declared dependencies; it reconstructs actual library usage inside compiled APK files. This requires reverse engineering, pattern matching, and aggregation of results into a dataset that can be analyzed statistically. The approach follows large-scale empirical Android research, where datasets such as AndroZoo are used to obtain representative application samples.
+The methodology is exploratory and data-driven. As we will see in the following sections, the study does not rely only on declared dependencies; it reconstructs actual library usage inside compiled APK files. This requires reverse engineering, pattern matching, and aggregation of results into a dataset that can be analyzed statistically.
 
 \section{Research Workflow}
 As we move through the methodology, we can follow the research workflow in three main phases: dataset preparation, automated extraction of dependency information, and analysis of the generated dataset. The detailed implementation is described later in Chapter ``System Design and Pipeline'', so here we focus only on the conceptual steps. The core idea is to first identify libraries from license declarations found in the decoded APK corpus, then use the source code of those libraries to generate package-based fingerprints. These fingerprints are then matched against all decoded APKs to find evidence of library usage, including cases where a library is present in the code but not declared in the license information. This allows us to compare declared and detected dependencies in the final results.
@@ -294,7 +284,7 @@ For each processed application, detected libraries and related metadata are stor
 
 \section{Repository Metadata and Health Metric}
 
-After library detection, the study enriches the dataset with GitHub repository data for detected open-source libraries. The repository-level analysis uses the health-score method proposed by \textcite{wangMethodEvaluateHealth2022}. This method produces a single repository health score based on 12 indicators grouped into pressure, state, and response layers. The resulting score is then converted into repository health levels: low, medium, and high. These health scores and levels provide context beyond simple library presence and support the later analysis of which APKs depend on libraries whose upstream repositories are not classified as high health.
+After library detection, the study enriches the dataset with GitHub repository data for detected open-source libraries. The repository-level analysis uses the health-score method proposed by \textcite{wangMethodEvaluateHealth2022}. This method produces a single repository health score based on 12 indicators grouped into pressure, state, and response layers. The resulting score is then converted into repository health levels: low, medium, and high. These health scores and levels provide context beyond simple library presence and support the later analysis of which APKs depend on libraries whose upstream repositories are classified as low or medium health.
 
 \section{Methodological Limitations}
 The method has several limitations. The APK corpus is limited by hardware resources because the pipeline is designed to run on a local device; therefore, decoding, indexing, matching, and repository processing could not be scaled without practical runtime and storage constraints. The corpus is also not category-balanced, so the findings should not be interpreted as representing all Google Play categories equally.
@@ -320,7 +310,7 @@ The goal of the pipeline is to automatically detect open-source libraries used i
 \section{Input Data Sources}
 The primary source of APK files is the AndroZoo dataset, which provides large‑scale collections of Android applications together with metadata such as SHA256 hash, package name, and market origin. The dataset enables reproducible selection of applications and supports automated download through an API. 
 
-In the first step, the large metadata CSV is filtered to keep only the most recent version of each application and to restrict the sample to apps available on Google Play. This filtering reduces the dataset size while preserving representative applications. Category information is then collected using a crawler to obtain official Google Play categories. The final dataset used in the pipeline contains only applications belonging to selected categories such as finance, healthcare, navigation, and communication, which are relevant for dependency and security analysis. 
+In the first step, the large metadata CSV is filtered to keep only the most recent version of each application and to restrict the sample to apps available on Google Play. This filtering reduces the dataset size while preserving representative applications. Category information is then collected using a crawler to obtain official Google Play categories. The final dataset used in the pipeline contains only applications belonging to sensitive categories such as finance and healthcare. 
 
 \section{APK Acquisition and Decoding}
 After the dataset is prepared, APK files are downloaded automatically using the AndroZoo API. Each APK is then decoded using the \texttt{apktool} utility, which converts the compiled application into a readable directory structure containing resources, manifest files, and smali code. Decoded applications are stored in a directory structure indexed by package name, which simplifies later lookup and cross‑matching. 
@@ -358,7 +348,7 @@ The fingerprint-matching step is based on the principle that library imports and
 
 After the fingerprint database is built, the pipeline scans decoded APK files for these import and class-definition references in smali code. The extracted paths are compared against stored package fingerprints using prefix matching. This step acts as the main detection gate: once library usage is identified, the later analysis checks whether the corresponding license was declared in the APK or whether the library was detected only through code evidence.
 
-The matching step enables detection of both declared and undeclared libraries and was optimized using indexed lookup to reduce runtime when processing larger datasets.
+The matching step enables detection of both declared and undeclared libraries and was optimized using binary search to reduce runtime when processing larger datasets.
 
 \section{Aggregation and Reporting}
 The final step aggregates all detected information into a unified report. For each application, the pipeline records detected libraries, license declarations, repository references, and matching evidence. The aggregated report also checks whether license notices appear close to the corresponding package usage or are stored in external assets, which helps evaluate compliance practices.
@@ -405,30 +395,30 @@ The following key performance indicators (KPIs) were extracted from the dataset 
 
 \begin{itemize}
 \item Number of detected libraries per APK
-\item Ratio of declared vs. undeclared libraries
+\item Ratio of cited vs. uncited libraries (license declared vs. undeclared)
 \item Number of unique libraries discovered
 \item Growth rate of newly discovered libraries
 \item Ratio of detection methods, comparing fingerprint-based evidence with license-based evidence
-\item Average number of matches per library (classes\_matched)
+\item Number of matches per library (classes\_matched)
 \end{itemize}
 
 \subsection{Observed Trends}
 The scaling analysis reveals several important patterns:
 
 \begin{itemize}
-\item The number of detected library occurrences per APK increases slowly across corpus sizes, although the available data does not show the exact point at which this metric fully stabilizes (Figure~\ref{fig:library-occurrence-rows-per-apk}).
+\item The number of evidences of open source library use per APK increases slowly across corpus sizes, although the available data does not show the exact point at which this metric fully stabilizes (Figure~\ref{fig:library-occurrence-rows-per-apk}).
 \item The number of unique libraries continues to grow with dataset size, but with diminishing returns, indicating that the most common libraries are discovered early (Figure~\ref{fig:unique-libraries-growth}) (Total numbers available in appendix Figure~\ref{fig:total-libraries-occurrences}.)
 \item A significant portion of libraries are detected through fingerprint matching, suggesting that license declarations alone are incomplete in many applications (Figure~\ref{fig:fingerprints-vs-license-exposure}).
-\item The ratio between declared and undeclared libraries becomes relatively stable from the 300-APK corpus onward, indicating consistent behavior across larger samples (Figure~\ref{fig:declared-vs-undeclared}).
+\item The ratio between cited and uncited libraries becomes relatively stable from the 300-APK corpus onward, indicating consistent behavior across larger samples (Figure~\ref{fig:declared-vs-undeclared}).
 \item Larger corpora improve the coverage of the fingerprint database and can increase detection accuracy, but the current 700-APK cap does not allow a precise conclusion about the final stabilization point.
 \end{itemize}
 
-The following figures illustrate the trends observed during scaling the corpus.
+The following figures illustrate the trends observed during scaling the corpus. Figure~\ref{fig:fingerprints-vs-license-exposure} shows that from the 100-APK corpus onward, more than 90\% of cited libraries are also detected through fingerprint matching. This supports the pipeline assumption that a license declaration and repository URL found in one APK can be used to build fingerprints from the original source repository and detect the same open-source library in other APKs.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth,keepaspectratio]{image/library_occurrence_rows_per_apk_distribution_boxplot.png}
-    \caption{Distribution of library occurrence rows per APK}
+    \caption{Distribution of evidence rows per APK}
     \label{fig:library-occurrence-rows-per-apk}
     \end{figure}
     
@@ -446,13 +436,10 @@ The following figures illustrate the trends observed during scaling the corpus.
     \label{fig:fingerprints-vs-license-exposure}
     \end{figure}
 
-Figure~\ref{fig:fingerprints-vs-license-exposure} shows that from the 100-APK corpus onward, more than 90\% of cited libraries are also detected through fingerprint matching. This supports the pipeline assumption that a license declaration and repository URL found in one APK can be used to build fingerprints from the original source repository and detect the same open-source library in other APKs.
-
-
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth,keepaspectratio]{image/cited_ratio_by_apk_collection_size.png}
-\caption{Ratio of declared vs. undeclared libraries across corpus sizes}
+\caption{Ratio of cited vs. uncited libraries across corpus sizes}
 \label{fig:declared-vs-undeclared}
 \end{figure}
 
@@ -482,7 +469,7 @@ MEDICAL & 56 \\
 
 \section{GitHub-Based Repository Health Score}
 
-After analyzing APK-level metrics, the we to repository-level evaluation using GitHub data. Prior studies show that open-source project health cannot be evaluated from a single raw repository attribute. \parencite{diruscioOSSMETERSoftwareMeasurement2015} present OSSMETER as a platform for automatically analysing OSS projects across multiple information sources, including source-code repositories, communication channels, and issue trackers. Their work is relevant because it frames OSS assessment as a multi-source measurement problem covering quality, maturity, development activity, and user support rather than only repository popularity.
+After analyzing APK-level metrics, we now move to repository-level evaluation using GitHub data. Prior studies show that open-source project health cannot be evaluated from a single raw repository attribute. \textcite{diruscioOSSMETERSoftwareMeasurement2015} present OSSMETER as a platform for automatically analysing OSS projects across multiple information sources, including source-code repositories, communication channels, and issue trackers. Their work is relevant because it frames OSS assessment as a multi-source measurement problem covering quality, maturity, development activity, and user support rather than only repository popularity.
 
 A more direct health-score approach is proposed by \parencite{jiangMetricsEvaluateHealth2019}, who use GitHub data and factor analysis to evaluate OSS project health. Their model transforms basic repository indexes into six synthetic health-related metrics: community activity, project popularity, development activity, completeness, responsiveness, and persistence. This is important for the present thesis because it shows that repository health can be represented through combined indicators derived from project activity and community behavior.
 
@@ -490,9 +477,7 @@ Building on this line of work, \parencite{wangMethodEvaluateHealth2022} provide 
 
 \subsection{Adopted Health-Score Model}
 
-\textcite{wangMethodEvaluateHealth2022} propose a method for evaluating the health of open-source software projects based on the pressure--state--response (PSR) model. Their model divides repository health into three categories: pressure, state, and response. Across these categories, they define 12 factors (see Table~\ref{tab:wang2022-health-factors}). The full explanation of the Wang and Wu model, including its theoretical background and data-collection logic, will be provided in Appendix~\ref{app:wang2022-health-model}.
-
-Table~\ref{tab:wang2022-health-factors} summarizes the 12 factors adopted in this thesis. The impact column indicates whether a larger value improves the health score (+) or reduces it (-). The weights are the final combined weights reported by Wang and Wu after combining AHP and entropy weighting.
+\textcite{wangMethodEvaluateHealth2022} propose a method for evaluating the health of open-source software projects based on the pressure--state--response (PSR) model. Their model divides repository health into three categories: pressure, state, and response. Across these categories, they define 12 factors (see Table~\ref{tab:wang2022-health-factors}). The impact column indicates whether a larger value improves the health score (+) or reduces it (-). The weights are the final combined weights reported by Wang and Wu after combining AHP and entropy weighting. The full explanation of the Wang and Wu model, including its theoretical background and data-collection logic, will be provided in Appendix~\ref{app:wang2022-health-model}.
 
 \begin{table}[htbp]
 \centering
@@ -576,7 +561,7 @@ Wang and Wu divide repository health scores into three levels: low health in the
 The repository-level health data will later be joined back to the APK-library evidence dataset. This makes it possible for us to estimate which APKs depend on medium-health libraries and how intense those libraries appear in each APK. The APK-level interpretation of this joined dataset is discussed later in Subsection~\ref{sec:medium-health-level-open-source-library-usage-in-apks}.
 
 
-\chapter{Validation}
+\chapter{Validation} \label{validation}
 
 \section{Validation Strategy}
 At this point, the pipeline has identified open-source libraries used in each analyzed APK through license extraction and fingerprint matching. The main validation question is whether these detected libraries can be compared against an independent baseline. Initially, the planned validation approach was to inspect applications manually and compare the pipeline output with the list of open-source libraries disclosed inside the application itself. This would have provided a direct user-visible validation source if applications exposed their dependency declarations through an in-app license screen.
@@ -590,24 +575,24 @@ The validation control set consists of 100 F-Droid applications. These applicati
 
 The APK analysis pipeline was then executed separately for these 100 F-Droid applications. For this validation run, the fingerprint database was not limited to fingerprints generated from the F-Droid repositories alone. Instead, it combined the fingerprints already gathered from the main 699-APK corpus with the additional fingerprints generated from the 100 F-Droid APKs and their related source-code evidence. This design made the validation run closer to the real pipeline setting, because the APKs were analyzed against the accumulated fingerprint knowledge available in the project rather than against an isolated minimal fingerprint set.
 
-The resulting APK-side validation dataset contains \textbf{15,353 library occurrence rows} across exactly \textbf{100 APK packages}. These rows correspond to \textbf{202 unique open-source libraries} when grouped by \texttt{repo\_url}, and none of the rows has a missing repository URL. This means that the validation subset is suitable for repository-level comparison because all detected library occurrences can be linked to a normalized repository identifier. The average number of detected library occurrences is \textbf{153.53 per APK} (Figure~\ref{fig:library-occurrences-per-apk-fdroid}), which is very close to the main 699-APK corpus average.
+The resulting APK-side validation dataset contains \textbf{15,353 evidence rows} across exactly \textbf{100 APK packages}. These rows correspond to \textbf{202 unique open-source libraries} when grouped by \texttt{repo\_url}, and none of the rows has a missing repository URL. This means that the validation subset is suitable for repository-level comparison because all evidneces can be linked to a normalized repository identifier. The average number of evidence rows of open source library use is \textbf{153.53 per APK} (Figure~\ref{fig:library-occurrences-per-apk-fdroid}) and the average number of distinct repository URL of open source libraries is \textbf{13.63 per APK}, both are very close to the main 699-APK corpus average (we will see in Chapter~\ref{results-and-discussion}).
 
-The citation pattern in the validation subset also shows that license disclosure remains incomplete even among open-source applications: approximately \textbf{68.55\%} of detected library occurrences are cited, while \textbf{31.45\%} are not cited. Among the cited rows, approximately \textbf{95.90\%} are also found by fingerprint evidence, while \textbf{38.13\%} are found through license-exposure evidence. This indicates that even in the F-Droid validation subset, fingerprint-based evidence remains the dominant confirmation mechanism, while direct license exposure captures only part of the dependency evidence.
+The citation pattern in the validation subset also shows that license disclosure remains incomplete even among open-source applications: approximately \textbf{68.55\%} of evidences of open source library use are cited, while \textbf{31.45\%} are not cited. Among the cited rows, approximately \textbf{95.90\%} are also found by fingerprint evidence, while \textbf{38.13\%} are found through license-exposure evidence. This indicates that even in the F-Droid validation subset, fingerprint-based evidence remains the dominant confirmation mechanism, while direct license exposure captures only part of the dependency evidence.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.7\textwidth,keepaspectratio]{image/library_occurrences_per_apk_boxplot_fdroid.png}
-\caption{Distribution of detected library occurrences per APK in the F-Droid validation set}
+\caption{Distribution of detected open source library use per APK in the F-Droid validation set}
 \label{fig:library-occurrences-per-apk-fdroid}
 \end{figure}
 
 \section{Source-Code Library Extraction Methods}
-The source-code validation step uses an extendable detector structure. Each method scans the cloned repository in a different way and contributes candidate library declarations. At this stage, five source-code detection methods are used:
+The source-code validation step uses multiple detector methids. Each method scans the cloned repository in a different way and contributes candidate library declarations. At this stage, five source-code detection methods are used:
 
 \begin{enumerate}
 \item \textbf{Gradle dependency detection}: scans \texttt{build.gradle} and \texttt{build.gradle.kts} files for dependency declarations such as \texttt{implementation}, \texttt{api}, \texttt{compileOnly}, \texttt{runtimeOnly}, \texttt{kapt}, and test-related configurations.
 \item \textbf{Version catalog detection}: scans \texttt{libs.versions.toml} files and extracts entries from the \texttt{[libraries]} section.
-\item \textbf{Third-party markup detection}: scans documentation files in directories such as \texttt{thirdparty}, \texttt{third\_party}, and \texttt{vendor}, including cases where libraries are listed in markup notes (README and LICENSE).
+\item \textbf{Third-party markdown detection}: scans documentation files in directories such as \texttt{thirdparty}, \texttt{third\_party}, and \texttt{vendor}, including cases where libraries are listed in markdown notes (README and LICENSE).
 \item \textbf{Vendor directory detection}: scans common bundled-library directories such as \texttt{thirdparty}, \texttt{third\_party}, \texttt{vendor}, \texttt{external}, and \texttt{libs}, and records subdirectories as possible embedded libraries.
 \item \textbf{GitHub URL detection}: scans text-like files across the repository for GitHub repository URLs and records them as candidate third-party libraries. Links pointing to the application repository itself are excluded so that internal project references are not counted as external libraries.
 \end{enumerate}
@@ -642,7 +627,7 @@ The match relationships were distributed across the matching methods as follows:
 \hline
 \textbf{Match type} & \textbf{Number of match relationships} \\
 \hline
-Contains match & 63,810 \\
+Namespace match & 63,810 \\
 Artifact match & 28,108 \\
 Repository URL match & 14,279 \\
 \hline
@@ -679,7 +664,7 @@ The validation should be interpreted as an approximate baseline rather than a pe
 The matching logic is intentionally permissive because APK evidence and source-code declarations often use different identifiers. Partial matching improves coverage, but it can also introduce false matches. A more exact validation would require opening each project in Android Studio and manually inspecting the full build configuration and codebase. Increasing the corpus size and fingerprint database may also change the accuracy in both directions: it can improve detection by discovering more libraries, but it can also introduce more transitive APK libraries that are difficult to match back to explicit source-code declarations. Therefore, the validation results should be read as a practical performance baseline for the current pipeline, not as a final measurement of absolute correctness.
 
 
-\chapter{Results and Discussion}
+\chapter{Results and Discussion} \label{results-and-discussion}
 \section{Findings}
 In this section, we will see the empirical findings derived from the APK-level analysis, focusing on library detection, citation behavior, and dependency structure. The results are based on the output dataset generated by the pipeline for the 699 APK corpus size.
 
@@ -688,20 +673,22 @@ The analysis of the APK corpus reveals consistent patterns in open-source librar
 
 \begin{itemize}
 \item Average number of libraries per APK: \textbf{154.84}
+\item Average number of repositories per APK: \textbf{15.34}
 \item Total number of unique libraries across corpus: \textbf{636}
-\item Ratio of declared (cited) libraries: \textbf{55.39\%}
-\item Ratio of undeclared libraries: \textbf{44.61\%}
+\item Ratio of cited libraries: \textbf{55.39\%}
+\item Ratio of uncited libraries: \textbf{44.61\%}
 \item Ratio of library records supported by fingerprint-based evidence: \textbf{96.06\%}
-\item Total library occurrence rows (evidence instances): \textbf{108,234}
+\item Total evidence rows of open source library use: \textbf{108,234}
 \end{itemize}
 
-These indicators suggest that Android applications rely heavily on external libraries, with an average of 154.84 library occurrences per APK. At the same time, only 55.39\% of detected libraries are explicitly declared through license information, while 44.61\% are identified exclusively through fingerprint-based detection. This demonstrates a substantial gap between actual dependency usage and documented license disclosure.
+These indicators suggest that Android applications rely heavily on external libraries, with an average of 154.84 evidence rows of open source library use per APK and the average number of 15.34 distinct repository URL of open source libraries per APK. to compare, the OSSRA report states that the average audited application contained 1,180 open-source components, with 64\% of components introduced transitively \parencite{OpenSourceSecurity2026}. This comparison should be interpreted cautiously because the OSSRA dataset is not necessarily Android-specific and may use a different counting method.
 
-The high fingerprint-based evidence ratio (96.06\%) shows that the fingerprint method delivers the expected result and can identify most library usage through code evidence. This is also computationally important because fingerprint lookup is less costly than full license-exposure lookup. The license-exposure check is therefore used mainly in the final stage to revalidate whether detected libraries are actually cited, and the results show that many are not. The detection-origin distribution for the 699 APK corpus is shown in Appendix Figure~\ref{fig:fingerprints-vs-license-exposure-apk-700} (Also look at the full summary at Appendix Table~\ref{tab:summary-kpis-final-corpus}).
+At the same time, only 55.39\% of detected libraries are explicitly declared through license information, while 44.61\% are identified exclusively through fingerprint-based detection. This demonstrates a substantial gap between actual dependency usage and documented license disclosure.
 
+These indicators suggest that Android applications rely heavily on external libraries, with an average of 154.84 evidences per APK. At the same time, only 55.39\% of detected libraries are explicitly declared through license information, while 44.61\% are identified exclusively through fingerprint-based detection. This demonstrates a substantial gap between actual dependency usage and documented license disclosure.
 
-\subsection{Library Detection and Citation Behavior}
-One of the most important findings of the analysis is the discrepancy between detected libraries and declared licenses. Out of 108,234 detected library occurrences, 48,280 instances (44.61\%) were identified only through fingerprint matching, indicating that license declarations are frequently incomplete or absent (Figure~\ref{fig:cited-vs-uncited}). There is no pattern in the app categories.
+The high fingerprint-based evidence ratio (96.06\%) shows that the fingerprint method delivers the expected result and can identify most library usage through code evidence. This is also computationally important because fingerprint lookup is less costly than full license-exposure lookup. The license-exposure check is therefore used mainly in the final stage to revalidate whether detected libraries are actually cited, and the results show that many are not. Overall, 48,280 of 108,234 evidences (44.61\%) were found only through fingerprint matching, showing that license declarations are frequently incomplete or absent, with no clear category-level pattern (Figure~\ref{fig:cited-vs-uncited}). The detection-origin distribution for the 699 APK corpus is shown in Appendix Figure~\ref{fig:fingerprints-vs-license-exposure-apk-700} (Also look at the full summary at Appendix Table~\ref{tab:summary-kpis-final-corpus}).
+
 
 
 \begin{figure}[htbp]
@@ -712,12 +699,12 @@ One of the most important findings of the analysis is the discrepancy between de
 \end{figure}
 
 \subsection{Distribution of Libraries Across APKs}
-The distribution of libraries per application shows high variability. As shown in Figure~\ref{fig:lib-dist-per-apk}, the mean number of detected library occurrences per APK is 154.84, while the median is lower at 123, indicating that some applications contain much larger dependency sets. In the final corpus, 55 APKs have fewer than 10 detected libraries, whereas 52 APKs have more than 400 detected libraries (For detailed info look at Appendix Figure~\ref{fig:library-occurrences-per-apk-histogram} and Figure~\ref{fig:fingerprints-vs-license-exposure-apk-700}.)
+The distribution of libraries per application shows high variability. As shown in Figure~\ref{fig:lib-dist-per-apk}, the mean number of evidences of open source library use per APK is 154.84, while the median is lower at 123, indicating that some applications contain much larger dependency sets. In the final corpus, 55 APKs have fewer than 10 detected libraries, whereas 52 APKs have more than 400 detected libraries (For detailed info look at Appendix Figure~\ref{fig:library-occurrences-per-apk-histogram} and Figure~\ref{fig:fingerprints-vs-license-exposure-apk-700}.)
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.7\textwidth,keepaspectratio]{image/library_occurrences_per_apk_boxplot.png}
-\caption{Distribution of detected library occurrences per APK}
+\caption{Distribution of evidences of open source library use per APK}
 \label{fig:lib-dist-per-apk}
 \end{figure}
 
@@ -738,7 +725,7 @@ MediumHealthIntensity = \frac{medium\_health\_classes\_matched}{apk\_total\_clas
 This measure does not claim to represent runtime execution frequency. Instead, it captures how much of the detected open-source code evidence inside an APK is associated with repositories classified as medium health. Applications with high values should therefore be interpreted as having stronger structural exposure to medium-health libraries.
 
 \subsubsection{Which APKs use open-source libraries with medium health?}
-The first question is which APKs contain at least one open-source library classified as \textit{medium health}. The analysis identifies \textbf{89} such APKs. For each APK, the aggregation records the number of medium-health evidence rows, the number of unique medium-health repositories, the number of matched classes associated with these libraries, and the percentage of the APK's total detected open-source class matches represented by medium-health libraries.
+The first question is which APKs contain at least one open-source library classified as \textit{medium health}. The analysis identifies \textbf{89} such APKs. For each APK, the aggregation records the number of medium-health evidence rows, the number of matched classes associated with these libraries, and the percentage of the APK's total detected open-source class matches represented by medium-health libraries.
 
 The ranking is based on intensity of medium-health library use (\texttt{medium\_health\_intensity\_pct\_of\_apk}). The highest observed values include \textit{KidiCom Chat™ (FR)} at \textbf{18.75\%}, \textit{CEMAH netCEM} at \textbf{1.71\%}, and \textit{NeurOm} at \textbf{0.57\%} (Figure~\ref{fig:top-apks-medium-health-intensity}). These applications therefore show the strongest relative presence of medium-health libraries within their detected open-source class usage.
 
@@ -767,13 +754,13 @@ The leading APKs by uncited medium-health library use intensity include \textit{
 From these findings, we can draw the following main interpretations:
 
 \begin{itemize}
-\item Android applications in the corpus rely heavily on external open-source libraries, with an average of 154.84 detected library occurrences per APK.
-\item License disclosure is incomplete: 44.61\% of detected library occurrences are uncited, meaning they are found through code evidence but not through license declarations.
+\item Android applications in the corpus rely heavily on external open-source libraries, with an average of 154.84 evidences of open source library use per APK.
+\item License disclosure is incomplete: 44.61\% of evidences of open source library use are uncited, meaning they are found through code evidence but not through license declarations.
 \item The fingerprint-based method is effective for this research goal, because 96.06\% of cited library records are also confirmed by fingerprint evidence.
-\item Dependency usage varies widely across applications, from APKs with very few detected libraries to APKs with more than 400 library occurrences.
+\item Dependency usage varies widely across applications, from APKs with 1 to 550 evidences of open source library use.
 \item Repository-level analysis shows that, among the 220 repositories with assigned Wang and Wu health levels, 204 are classified as high health and 16 as medium health, while no repository falls into the low-health category.
-\item Medium-health libraries appear in 225 APK/library evidence rows across 89 distinct APKs, representing 12.7\% of the analyzed application corpus.
-\item Uncited medium-health libraries are especially important because users and auditors cannot easily identify them from license disclosure alone; in this corpus, 69 uncited medium-health rows appear across 34 APKs.
+\item Medium-health libraries appear in 225 evidence rows across 89 distinct APKs, representing 12.7\% of the analyzed application corpus.
+\item Uncited medium-health libraries are especially important because users and auditors cannot easily identify them from license disclosure alone; in this corpus, 69 uncited medium-health evidence rows appear across 34 APKs.
 \end{itemize}
 
 Overall, the results show that the main issue is not only the presence of open-source libraries, but the gap between actual library usage and what is disclosed to users or reviewers. The repository-health analysis adds another layer to this finding by showing which detected libraries come from repositories with lower health levels.
@@ -789,16 +776,16 @@ As end users, we face limited transparency. Because many libraries are uncited, 
 We can now return to the research questions and answer them based on the results. The thesis investigated whether external open-source libraries can be detected in compiled Android APK files and whether the detected dependencies are consistently disclosed through license information. The results show that fingerprint-based evidence can reveal substantial library usage that is not visible from license declarations alone.
 
 \textbf{RQ1: Is it feasible to detect external libraries in Android APK files?}
-Yes. The developed pipeline successfully processed the APK corpus, decoded applications, extracted license evidence, generated fingerprints from source repositories, and matched those fingerprints against decoded APK code. In the final corpus, the pipeline produced 108,234 library occurrence rows across 699 APKs, showing that automated library detection is feasible at this scale.
+Yes. The developed pipeline successfully processed the APK corpus, decoded applications, extracted license evidence, generated fingerprints from source repositories, and matched those fingerprints against decoded APK code. In the final corpus, the pipeline produced 108,234 evidence records across 699 APKs, showing that automated library detection is feasible at this scale.
 
 \textbf{RQ2: How reliable are license declarations and package fingerprints for identifying library dependencies?}
-License declarations are useful but incomplete. In the final corpus, only 55.39\% of detected library occurrences were cited, while 44.61\% were uncited and visible only through code evidence. Package fingerprints were more effective for detection: 96.06\% of cited library records were also confirmed by fingerprint evidence. This supports the use of fingerprints as the main detection method, with license exposure used mainly for citation validation.
+License declarations are useful but incomplete. In the final corpus, only 55.39\% of evidences of open source library use were cited, while 44.61\% were uncited and visible only through code evidence. Package fingerprints were more effective for detection: 96.06\% of cited library records were also confirmed by fingerprint evidence. This supports the use of fingerprints as the main detection method, with license exposure used mainly for citation validation.
 
-\textbf{RQ3: How many open-source libraries, and what types of them, are used in a sample of Android applications?}
-The final corpus contains 636 unique repository URLs and an average of 154.84 detected library occurrences per APK. The libraries are mainly detected through Java and Kotlin package fingerprints. Repository-level analysis also showed that among the 220 GitHub repositories with assigned health levels, 204 repositories were classified as high health, 16 repositories were classified as medium health, and no repository was classified as low health.
+\textbf{RQ3: How many open source libraries, and on what health level, are used in a sample of Android applications?}
+The final corpus contains 636 unique repository URLs and an average of 154.84 evidences of open source library use per APK. The libraries are mainly detected through Java and Kotlin package fingerprints. Repository-level analysis also showed that among the 220 GitHub repositories with assigned health levels, 204 repositories were classified as high health, 16 repositories were classified as medium health, and no repository was classified as low health.
 
 \textbf{RQ4: Which Android applications show the highest dependency on low-health or medium-health open-source libraries?}
-The analysis identified 225 medium-health APK/library evidence rows across 89 distinct APKs and it doesn't identify any low-health libraries. Dependency strength was measured by medium-health library use intensity, meaning the percentage of an APK's total detected open-source class matches that belong to medium-health repositories. Based on this intensity measure, the leading applications are \textit{KidiCom Chat™ (FR)}, \textit{CEMAH netCEM}, and \textit{NeurOm}. These applications therefore have the strongest relative exposure to medium-health libraries within their detected open-source code evidence.
+The analysis identified 225 medium-health evidence rows across 89 distinct APKs and it doesn't identify any low-health libraries. Dependency strength was measured by medium-health library use intensity, meaning the percentage of an APK's total detected open-source class matches that belong to medium-health repositories. Based on this intensity measure, the leading applications are \textit{KidiCom Chat™ (FR)}, \textit{CEMAH netCEM}, and \textit{NeurOm}. These applications therefore have the strongest relative exposure to medium-health libraries within their detected open-source code evidence.
 
 Overall, the practical part of the thesis was applicable and completed: the APK collection was built, the decoding and matching pipeline was implemented, GitHub metadata was collected, repository health scores were calculated, and the final dataset was analyzed. The pipeline can also target a standalone APK, add it to the corpus, identify its open-source library ingredients, assess their repository health levels, and compare it with other APKs. The validation chapter showed that in-app license screens are usually not a reliable validation baseline, while the F-Droid source-code control set provided a more useful approximate ground truth and confirmed that the pipeline can recover a meaningful portion of dependency evidence, although both precision and recall remain limited by differences between compiled APK contents and source-code declarations.
 
@@ -808,6 +795,8 @@ Some expectations were only partially achieved. The corpus size remained limited
 The pipeline created a labeled corpus that records which files and lines contain evidence of external library imports, exports, and class references. This creates an opportunity for future work based on text analysis and machine learning. Instead of relying only on rule-based fingerprint matching and repeated lookup operations, future versions of the system could tokenize the indexed evidence lines and train a model to classify whether a line is likely to indicate external library usage. Such a model could use features from package names, import patterns, file paths, comments, and surrounding code context.
 
 This direction is realistic because prior research has shown that source-code tokenization and machine-learning representations can support software engineering and cybersecurity tasks. However, it should be treated as a follow-up improvement rather than a replacement for the current method. The current fingerprint approach is interpretable and produces direct evidence for each library match, while a machine-learning model would need careful validation to avoid false positives.
+
+Another future improvement is to refactor the pipeline for a cloud environment such as AWS. This would reduce the current hardware limitation, allow the analysis of a much larger APK corpus, and support parallel decoding, repository cloning, fingerprint generation, and matching. A larger corpus would also enrich the fingerprint database, which could increase the chance of finding additional evidence of open-source library use in APKs.
 
 \printbibliography[heading=bibintoc,title={References}]
 
@@ -875,7 +864,7 @@ This produces one repository-level health score.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth,keepaspectratio]{image/total_library_occurrences_by_apk_collection_size.png}
-    \caption{Total detected library occurrences as the APK corpus size increases}
+    \caption{Total evidences of open source library use as the APK corpus size increases}
     \label{fig:total-libraries-occurrences}
 \end{figure}
 
@@ -896,7 +885,7 @@ This produces one repository-level health score.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth,keepaspectratio]{image/library_occurrences_per_apk_histogram.png}
-    \caption{Histogram of detected library occurrences per APK in the final corpus}
+    \caption{Histogram of evidences of open source library use per APK in the final corpus}
     \label{fig:library-occurrences-per-apk-histogram}
 \end{figure}
 
@@ -908,24 +897,27 @@ This produces one repository-level health score.
     \hline
     \textbf{Metric} & \textbf{Value} \\
     \hline
-    Total library occurrences & 266 \\
-    Total unique library occurrences & 91 \\
-    Cited library occurrences & 255 \\
-    Uncited library occurrences & 11 \\
+    Total evidences & 266 \\
+    Total unique evidences & 91 \\
+    Cited evidences & 255 \\
+    Uncited evidences & 11 \\
     Cited ratio & 95.86\% \\
     Uncited ratio & 4.35\% \\
-    Library occurrences detected by fingerprint & 68 \\
-    Library occurrences detected by license-exposure & 251 \\
-    Library occurrences detected by fingerprint and license-exposure & 53 \\
-    Cited Library occurrences found by fingerprints & 57 \\
-    Medium health library occurrences & 0 \\
+    Evidences by fingerprint & 68 \\
+    Evidences by license-exposure & 251 \\
+    Evidences by fingerprint and license-exposure & 53 \\
+    Cited evidences found by fingerprints & 57 \\
+    Medium health evidences & 0 \\
     \hline
+    {\footnotesize\textit{Note.} Evidence: a record on analysis dataset associated with open source library use}
     \end{tabular}
     \end{table}
 
 
 \begin{table}[!ht]
     \centering
+    \caption{List of apps for manual license investigation.}
+    \label{tab:list-apps-manual-validation}
     \begin{tabular}{|l|l|l|}
     \hline
         \textbf{app\_name} & \textbf{downloads} & \textbf{category} \\ \hline
@@ -957,36 +949,39 @@ This produces one repository-level health score.
         BrightStar CU Mobile & 10K+ & FINANCE \\ \hline
         Apple Bank Mobile Banking & 100K+ & FINANCE \\ \hline
     \end{tabular}
-    \caption{List of apps for manual license investigation.}
-    \label{tab:list-apps-manual-validation}
+    {\footnotesize\textit{Note.} Manual license investigation was not successful; None of these apps provide in-app list of open-source libraries except \textit{BudapestGO}.}
 \end{table}
 
 
 \begin{table}[htbp]
 \centering
-\caption[Merged summary KPIs for the 699 APK corpus]{Merged summary KPIs for the 699 APK corpus; each dataset row represents one evidence instance AKA library occurrences}
+\caption[Merged summary KPIs for the 699 APK corpus]{Merged summary KPIs for the 699 APK corpus; each dataset row represents one evidence of open source library use}
 \label{tab:summary-kpis-final-corpus}
 \begin{tabular}{lr}
 \hline
 \textbf{Metric} & \textbf{Value} \\
 \hline
-Total library occurrences & 108,234 \\
+Total evidences & 108,234 \\
 Unique APK packages & 699 \\
-Library occurrences with missing repository URL & 0 \\
+Evidences with missing repository URL & 0 \\
 Total generated fingerprints & 6,536 \\
-Cited library occurrences & 59,954 \\
-Uncited library occurrences & 48,280 \\
-Cited ratio of total library occurrences & 55.39\% \\
-Uncited ratio of total library occurrences & 44.61\% \\
-Library occurrences detected by fingerprint evidence & 105,874 \\
-Library occurrences detected by license-exposure evidence & 3,478 \\
-Cited library occurrences found by fingerprints & 57,594 \\
-Fingerprint ratio among cited library occurrences & 96.06\% \\
-License-exposure ratio among cited library occurrences & 5.80\% \\
-Average library occurrences per APK & 154.84 \\
-Median library occurrences per APK & 123 \\
-Minimum library occurrences per APK & 1 \\
-Maximum library occurrences per APK & 550 \\
+Cited evidences & 59,954 \\
+Uncited evidences & 48,280 \\
+Cited ratio of total evidences & 55.39\% \\
+Uncited ratio of total evidences & 44.61\% \\
+Evidences found by fingerprint & 105,874 \\
+Evidences found by license-exposure & 3,478 \\
+Cited evidences found by fingerprints & 57,594 \\
+Fingerprint ratio among cited evidences & 96.06\% \\
+License-exposure ratio among cited evidences & 5.80\% \\
+Average evidences per APK & 154.84 \\
+Median evidences per APK & 123 \\
+Minimum evidences per APK & 1 \\
+Maximum evidences per APK & 550 \\
+Average repositories per APK & 15.34 \\
+Median repositories per APK & 15 \\
+Minimum repositories per APK & 1 \\
+Maximum repositories per APK & 91 \\
 Unique repository URLs & 636\textsuperscript{*} \\
 Unique cloned GitHub repository attempts & 274\textsuperscript{*} \\
 GitHub repositories found & 220 \\
